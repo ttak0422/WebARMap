@@ -1,0 +1,21 @@
+{
+  "name": "place2coordinate",
+  "version": "1.0.0",
+  "description": "place2coordinate",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode=development",
+    "start": "webpack-dev-server --mode=development"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^4.12.0",
+    "webpack-cli": "^3.0.8"
+  },
+  "dependencies": {
+    "three": "^0.93.0",
+    "three.ar.js": "^0.1.8"
+  }
+}
