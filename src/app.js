@@ -7,9 +7,11 @@ var canvas, camera, scene, renderer, reticle;
 /// ********* -- ********* ///
 
 
-/// ********* AR ********* ///
+/// ********* other ********* ///
+var arDebugger;
 var reticle;
-/// ********* -- ********* ///
+
+/// ********* ----- ********* ///
 
 
 THREEAR.ARUtils.getARDisplay().then(function (display) {
@@ -26,6 +28,7 @@ THREEAR.ARUtils.getARDisplay().then(function (display) {
 function init() {
     initArSystem();
     initReticle();
+    initDebugger();
     update();
 }
 
@@ -73,6 +76,10 @@ function updateArSystem() {
     vrDisplay.requestAnimationFrame(update);
 }
 
+function initDebugger() {
+    arDebugger = new THREEAR.ARDebug(vrDisplay);
+    document.body.appendChild(arDebugger.getElement());
+}
 
 function initReticle() { 
     reticle = new THREEAR.ARReticle(vrDisplay, 0.03, 0.04, 0xff0077, 0.25); 
