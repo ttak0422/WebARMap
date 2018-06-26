@@ -29,7 +29,7 @@ THREEAR.ARUtils.getARDisplay().then(function (display) {
 
 function init() {
     initArSystem();
-    initReticle();
+    //initReticle();
     initDebugger();
     initHud();    
     update();
@@ -38,7 +38,7 @@ function init() {
 
 function update() {
     updateArSystem();
-    updateReticle();
+    //updateReticle();
     updateHud();
 }
 
@@ -69,13 +69,14 @@ function initArSystem() {
     document.body.appendChild(renderer.domElement);
 }
 function updateArSystem() {
+    renderer.clearColor();
+    arView.render();    
     camera.updateProjectionMatrix();
     vrDisplay.getFrameData(vrFrameData);
-    curPos = vrFrameData.pose.position;
     vrControls.update();
-    arView.render();    
     renderer.clearDepth();    
-    renderer.render(scene, camera);        
+    renderer.render(scene, camera);             
+    curPos = vrFrameData.pose.position;    
     vrDisplay.requestAnimationFrame(update);
 }
 /// ********* _________ ********* ///
@@ -105,7 +106,7 @@ function initHud() {
     hudCanvas.width  = width;
     hudCanvas.height = height;
     hudBitmap = hudCanvas.getContext('2d');
-    hudBitmap.font = "Normal 40px Arial";
+    hudBitmap.font = "Normal 30px Arial";
     hudBitmap.textAlign = 'center';
     hudBitmap.fillStyle = 'rgba(45, 45, 45, 0.9)';
     hudBitmap.fillText('Initializing...', width / 2, height / 2);
