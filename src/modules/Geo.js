@@ -4,15 +4,15 @@ module.exports = Geo = function() {
     let self = this;
 
     var watchId = null;
-    var baseLat,baseLng;
-    var baseX,baseY,baseZ;
+    var baseLat,baseLng;    
     var curLat,curLng;
     var counter = 0;
+    
     //TODO: Promise -> async
     function checkReady4GPS(){
         return new Promise(function(resolve, reject){
             if(navigator.geolocation){
-                console.log("your device is ready for this tracking!");
+                console.log("your device is ready for gps tracking!");
                 resolve();
             }else{
                 alert('not suppoered!');
@@ -32,7 +32,7 @@ module.exports = Geo = function() {
                     resolve();
                 },
                 function(err){ 
-                    alert('error!'); 
+                    alert('get baseLatLng error!'); 
                     reject();
                 }            
             );        
@@ -71,13 +71,13 @@ module.exports = Geo = function() {
     async function asyncLatLng2Merc(lat, lng){
         let latRad = await asyncDeg2rad(lat);
         let lngRad = await asyncDeg2rad(lng);
-        let xM = EARTH_R * lngRad;
-        let yM = EARTH_R * Math.log((Math.sin(latRad) + 1) / Math.cos(latRad));        
+        let yM = EARTH_R * latRad;
+        let xM = EARTH_R * lngRad;        
         return ({x : xM, y : yM});
     }
     async function asyncLatLng2Pos(lat, lng){        
         let objPoint  = await asyncLatLng2Merc(lat, lng);
-        let basePoint = await asyncLatLng2Merc(baseLat, baseLng);    
+        let basePoint = await asyncLatLng2Merc(baseLat, baseLng);            
         let x = objPoint.x - basePoint.x;
         let y = 1.0 // 適当
         let z = objPoint.y - basePoint.y;        
@@ -85,9 +85,10 @@ module.exports = Geo = function() {
     }
     function init(){
         //TODO:fix 起動と同時にGPSにアクセスするのはだめ
+        console.log("--- init Geo ---");
         checkReady4GPS()
-        .then(getBaseLatLng, function(){ alert('getBaseLatLng') })
-        .then(startWatchPos, function(){ alert('startWatchPos') })
+        .then(getBaseLatLng, function(){ alert('getBaseLatLng error.') })
+        .then(startWatchPos, function(){ alert('startWatchPos error.') })
         .then(function(){ console.log("Geo System is Ready...."); });
     }
     
@@ -95,10 +96,18 @@ module.exports = Geo = function() {
     init();
     //--- --- ----//
 
-    self.getPos = async function(lat, lng){
-        console.log("input : " + lat + ", " + lng);
-        let pos = await asyncLatLng2Pos(lat, lng);
-        console.log("output1 : " + pos.x + ", " + pos.y + ", " + pos.z);        
-        return tmp;
+    self.getPos = async function(){        
+        let pos = await asyncLatLng2Pos(curLat, curLng);
+        console.log("input  : " + curLat + ", " + curLng);        
+        console.log("output : " + pos.x + ", " + pos.y + ", " + pos.z);        
+        return pos;
     };    
+
+    self.debugPos = async function(lat, lng){        
+        let pos = await asyncLatLng2Pos(lat, lng);
+        console.log("input  : " + lat + ", " + lng);        
+        console.log("output : " + pos.x + ", " + pos.y + ", " + pos.z);        
+        return pos;
+    };    
+
 }
