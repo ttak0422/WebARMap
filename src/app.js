@@ -1,11 +1,17 @@
 import 'three/VRControls';
 import 'three/GLTFLoader';
+const Geo = require('./modules/Geo');
 
 /// ********* AR ********* ///
 var vrFrameData,vrDisplay, vrControls, arView; 
 var curPos;
 var canvas, camera, scene, renderer, reticle;
+var anchorManager;
 /// ********* -- ********* ///
+
+/// ********* GEO ********* ///
+var geo;
+/// ********* --- ********* ///
 
 /// ********* other ********* ///
 var arDebugger;
@@ -14,39 +20,70 @@ var hudCanvas, hudBitmap, hudCamera, hudTexture, hudMaterial;
 var planeGeometry, plane, hudScene;
 /// ********* ----- ********* ///
 
-
-THREEAR.ARUtils.getARDisplay().then(function (display) {
-    if (display) {        
-        vrFrameData = new VRFrameData();
-        vrDisplay = display;        
-        init();   
-        alert('ようこそARの世界へ！');
-    } else {        
-        THREEAR.ARUtils.displayUnsupportedMessage();
-    }
-});
-
+init();
 
 function init() {
-    initArSystem();
-    //initReticle();
-    initDebugger();
-    initHud();    
-    update();
+    THREEAR.ARUtils.getARDisplay().then(function (display) {            
+        if (display) {        
+            vrFrameData = new VRFrameData();
+            vrDisplay = display;        
+            alert('ようこそARの世界へ！ v0.0616');
+            initArSystem();
+            initReticle();
+            initDebugger();
+            //initHud();        
+            geo = new Geo();
+            update();
+        } else {        
+            THREEAR.ARUtils.displayUnsupportedMessage();                                        
+        }
+    });            
 }
-
 
 function update() {
     updateArSystem();
-    //updateReticle();
-    updateHud();
+    updateReticle();
+    //updateHud();
 }
-
 
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+async function test(){
+    alert('おしたお');    
+    let pos = await geo.getPos();
+    alert("output : " + pos.x + ", " + pos.y + ", " + pos.z);
+}
+
+document.onkeydown = function(e){    
+};
+
+function onClick(e) {
+    //タップ
+    switch(e.touches.length){
+        case 1:
+            let x = e.touches[0].pageX / window.innerWidth;
+            let y = e.touches[0].pageY / window.innerHeight;
+            let hits = vrDisplay.hitTest(x,y);        
+            if(hits && hits.length){
+                let hit = hits[0];            
+                let mm = hit.modelMatrix;                    
+                let x = mm[12];
+                let y = mm[13];
+                let z = mm[14];
+                
+                console.log(x + " " + y + " " + z);
+                
+                test();
+                
+            }
+            break;
+        case 2:
+            break;
+    }    
 }
 
 
@@ -58,6 +95,7 @@ function initArSystem() {
     renderer.autoClear = false;    
     scene  = new THREE.Scene();
     arView = new THREEAR.ARView(vrDisplay, renderer);
+    anchorManager = new THREEAR.ARAnchorManager(vrDisplay);    
     camera = new THREEAR.ARPerspectiveCamera(
                 vrDisplay,
                 60, //fov
@@ -67,6 +105,9 @@ function initArSystem() {
             );    
     vrControls = new THREE.VRControls(camera);    
     document.body.appendChild(renderer.domElement);
+    
+    window.addEventListener('resize', onWindowResize, false);
+    window.addEventListener('touchstart', onClick, false);    
 }
 function updateArSystem() {
     renderer.clearColor();
@@ -83,7 +124,7 @@ function updateArSystem() {
 
 /// ********* AR Debugger ********* ///
 function initDebugger() {
-    arDebugger = new THREEAR.ARDebug(vrDisplay);
+    arDebugger = new THREEAR.ARDebug(vrDisplay,scene);
     document.body.appendChild(arDebugger.getElement());
 }
 /// ********* ___________ ********* ///
@@ -108,7 +149,7 @@ function initHud() {
     hudBitmap = hudCanvas.getContext('2d');
     hudBitmap.font = "Normal 30px Arial";
     hudBitmap.textAlign = 'center';
-    hudBitmap.fillStyle = 'rgba(45, 45, 45, 0.9)';
+    hudBitmap.fillStyle = 'rgba(245, 245, 245, 0.9)';
     hudBitmap.fillText('Initializing...', width / 2, height / 2);
     hudCamera  = new THREE.OrthographicCamera(-width/2, width/2, height/2, -height/2, 0, 30);
     hudScene   = new THREE.Scene();

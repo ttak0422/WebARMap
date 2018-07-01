@@ -28,11 +28,24 @@ module.exports = Geo = function() {
                     let crd = pos.coords; 
                     baseLat = crd.latitude;
                     baseLng = crd.longitude;                 
-                    console.log("base position:", baseLat, baseLng);
+                    console.log("base position:" + baseLat.toString() + "," + baseLng.toString());
                     resolve();
                 },
                 function(err){ 
-                    alert('get baseLatLng error!'); 
+                    switch(err.code) {
+                        case 1: //PERMISSION_DENIED
+                            alert("位置情報の利用が許可されていません");
+                            break;
+                        case 2: //POSITION_UNAVAILABLE
+                            alert("現在位置が取得できませんでした");
+                            break;
+                        case 3: //TIMEOUT
+                            alert("タイムアウトになりました");
+                            break;
+                        default:
+                            alert("その他のエラー(エラーコード:"+error.code+")");
+                            break;
+                    }
                     reject();
                 }            
             );        
@@ -65,9 +78,7 @@ module.exports = Geo = function() {
         geolocation.clearWatch(watchId);
     }
 
-    async function asyncDeg2rad(deg){
-        return deg / 180.0 * Math.PI;
-    }    
+    async function asyncDeg2rad(deg){ return deg / 180.0 * Math.PI; }    
     async function asyncLatLng2Merc(lat, lng){
         let latRad = await asyncDeg2rad(lat);
         let lngRad = await asyncDeg2rad(lng);
