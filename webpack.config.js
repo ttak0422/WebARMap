@@ -11,7 +11,8 @@ module.exports = {
     },
     resolve: {
         alias: {                        
-            'three/VRControls': path.join(__dirname, 'node_modules/three/examples/js/controls/VRControls.js')
+            'three/VRControls': path.join(__dirname, 'node_modules/three/examples/js/controls/VRControls.js'),
+            'three/GLTFLoader': path.join(__dirname, 'node_modules/three/examples/js/loaders/GLTFLoader.js')
         }
     },
     plugins: [
