@@ -4,9 +4,7 @@ const Geo = require('./modules/Geo');
 
 /// ********* AR ********* ///
 var vrFrameData,vrDisplay, vrControls, arView; 
-var curPos;
-var canvas, camera, scene, renderer, reticle;
-var anchorManager;
+var camera, scene, renderer, reticle;
 /// ********* -- ********* ///
 
 /// ********* GEO ********* ///
@@ -27,23 +25,22 @@ function init() {
         if (display) {        
             vrFrameData = new VRFrameData();
             vrDisplay = display;        
-            alert('ようこそARの世界へ！ v0.0616');
-            initArSystem();
-            initReticle();
+            alert('ようこそARの世界へ！ v0.0649');
+            initArSystem();            
             initDebugger();
-            //initHud();        
-            geo = new Geo();
+            initHud();
+            geo = new Geo();            
             update();
         } else {        
-            THREEAR.ARUtils.displayUnsupportedMessage();                                        
+            THREEAR.ARUtils.displayUnsupportedMessage();
+            geo = new Geo();
         }
     });            
 }
 
-function update() {
-    updateArSystem();
-    updateReticle();
-    //updateHud();
+function update() {    
+    updateArSystem();    
+    updateHud(geo.getHeading());
 }
 
 function onWindowResize() {
@@ -52,10 +49,7 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-async function test(){
-    alert('おしたお');    
-    let pos = await geo.getPos();
-    alert("output : " + pos.x + ", " + pos.y + ", " + pos.z);
+async function asyncTouchFunc(){    
 }
 
 document.onkeydown = function(e){    
@@ -77,7 +71,7 @@ function onClick(e) {
                 
                 console.log(x + " " + y + " " + z);
                 
-                test();
+                asyncTouchFunc();
                 
             }
             break;
@@ -85,7 +79,6 @@ function onClick(e) {
             break;
     }    
 }
-
 
 /// ********* AR System ********* ///
 function initArSystem() {
@@ -104,10 +97,10 @@ function initArSystem() {
                 vrDisplay.depthFar
             );    
     vrControls = new THREE.VRControls(camera);    
-    document.body.appendChild(renderer.domElement);
+    document.body.appendChild(renderer.domElement);    
     
     window.addEventListener('resize', onWindowResize, false);
-    window.addEventListener('touchstart', onClick, false);    
+    window.addEventListener('touchstart', onClick, false);        
 }
 function updateArSystem() {
     renderer.clearColor();
@@ -117,7 +110,7 @@ function updateArSystem() {
     vrControls.update();
     renderer.clearDepth();    
     renderer.render(scene, camera);             
-    curPos = vrFrameData.pose.position;    
+    curDevicePos = vrFrameData.pose.position;    
     vrDisplay.requestAnimationFrame(update);
 }
 /// ********* _________ ********* ///
@@ -162,9 +155,13 @@ function initHud() {
     hudScene.add(plane);  
 }
 var counter = 0; //フレーム数(動作確認用)
-function updateHud() {       
+function poseToString(pose) {
+    return pose[0].toFixed(2) + ', ' + pose[1].toFixed(2) + ', ' + pose[2].toFixed(2);
+}
+function updateHud(str) {       
     hudBitmap.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    hudBitmap.fillText("counter : " + counter.toString(), window.innerWidth/2, window.innerHeight/2);
+    //vrFrameData        
+    hudBitmap.fillText(str, window.innerWidth/2, window.innerHeight/2);
     hudTexture.needsUpdate = true;
     counter++;
     renderer.render(hudScene, hudCamera);
