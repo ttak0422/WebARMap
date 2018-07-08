@@ -1,19 +1,16 @@
 module.exports = Geo = function() {   
     const EARTH_R = 6378137.0;    
-    
-    //
-    var alpha = -1;
-    var beta  = -1;
-    var gamma = -1;
-    //
-
+            
     let self = this;
 
     var watchId = null;
     var basCrd;
     var curCrd;        
     var counter = 0;
-    
+    var alpha = -1;
+    var beta  = -1;
+    var gamma = -1;    
+
     //TODO: Promise -> async
     function checkReady4GPS(){
         return new Promise((resolve, reject) => {
@@ -81,18 +78,18 @@ module.exports = Geo = function() {
 
     async function asyncDeg2rad(deg){ return deg / 180.0 * Math.PI; }    
     async function asyncLatLng2Merc(lat, lng){
-        let latRad = await asyncDeg2rad(lat);
-        let lngRad = await asyncDeg2rad(lng);
-        let yM = EARTH_R * latRad;
-        let xM = EARTH_R * lngRad;        
+        const latRad = await asyncDeg2rad(lat);
+        const lngRad = await asyncDeg2rad(lng);
+        const yM = EARTH_R * latRad;
+        const xM = EARTH_R * lngRad;        
         return ({x : xM, y : yM});
     }
     async function asyncLatLng2Pos(lat, lng){        
-        let objPoint  = await asyncLatLng2Merc(lat, lng);
-        let basPoint = await asyncLatLng2Merc(basCrd.latitude, basCrd.longitude);            
-        let x = objPoint.x - basPoint.x;
-        let y = 1.0 // 適当
-        let z = objPoint.y - basPoint.y;        
+        const objPoint  = await asyncLatLng2Merc(lat, lng);
+        const basPoint  = await asyncLatLng2Merc(basCrd.latitude, basCrd.longitude);            
+        const x = objPoint.x - basPoint.x;
+        const y = 1.0 // 適当
+        const z = objPoint.y - basPoint.y;        
         return ({x : x, y : y, z : z});
     }
     function init(){
@@ -116,21 +113,21 @@ module.exports = Geo = function() {
     //--- --- ----//
 
     self.getOffsetPos = async function(){
-        let pos = await asyncLatLng2Pos(basCrd.latitude, bas.longitude);
+        const pos = await asyncLatLng2Pos(basCrd.latitude, bas.longitude);
         console.log("input  : " + basCrd.latitude + ", " + basCrd.longitude);
         console.log("output : " + pos.x + ", " + pos.y + ", " + pos.z);
         return pos;
     }
 
     self.getCurPos = async function(){        
-        let pos = await asyncLatLng2Pos(curCrd.latitude, curCrd.longitude);
+        const pos = await asyncLatLng2Pos(curCrd.latitude, curCrd.longitude);
         console.log("input  : " + curCrd.latitude + ", " + curCrd.longitude);        
         console.log("output : " + pos.x + ", " + pos.y + ", " + pos.z);        
         return pos;
     };    
 
     self.debugPos = async function(lat, lng){        
-        let pos = await asyncLatLng2Pos(lat, lng);
+        const pos = await asyncLatLng2Pos(lat, lng);
         console.log("input  : " + lat + ", " + lng);        
         console.log("output : " + pos.x + ", " + pos.y + ", " + pos.z);        
         return pos;
@@ -145,35 +142,27 @@ module.exports = Geo = function() {
     }
 
     self.getHeading = function(){
+        //参考
         //http://w3c.github.io/deviceorientation/spec-source-orientation.html#worked-example
-        var degtorad = Math.PI / 180; // Degree-to-Radian conversion
-
-        var _x = beta  ? beta  * degtorad : 0; // beta value
-        var _y = gamma ? gamma * degtorad : 0; // gamma value
-        var _z = alpha ? alpha * degtorad : 0; // alpha value
-
-        var cX = Math.cos(_x);
-        var cY = Math.cos(_y);
-        var cZ = Math.cos(_z);
-        var sX = Math.sin(_x);
-        var sY = Math.sin(_y);
-        var sZ = Math.sin(_z);
-
-        // Calculate Vx and Vy components
-        var Vx = -cZ * sY - sZ * sX * cY;
-        var Vy = -sZ * sY + cZ * sX * cY;
-
-        // Calculate compass heading
-        var compassHeading = Math.atan(Vx / Vy);
-
-        // Convert compass heading to use whole unit circle
+        const degtorad = Math.PI / 180;
+        const _x = beta  ? beta  * degtorad : 0;
+        const _y = gamma ? gamma * degtorad : 0;
+        const _z = alpha ? alpha * degtorad : 0;
+        const cX = Math.cos(_x);
+        const cY = Math.cos(_y);
+        const cZ = Math.cos(_z);
+        const sX = Math.sin(_x);
+        const sY = Math.sin(_y);
+        const sZ = Math.sin(_z);        
+        const Vx = -cZ * sY - sZ * sX * cY;
+        const Vy = -sZ * sY + cZ * sX * cY;        
+        let compassHeading = Math.atan(Vx / Vy);
         if (Vy < 0) {
-        compassHeading += Math.PI;
+            compassHeading += Math.PI;
         } else if (Vx < 0) {
-        compassHeading += 2 * Math.PI;
+            compassHeading += 2 * Math.PI;
         }
-
-        return parseInt(compassHeading * ( 180 / Math.PI )); // Compass Heading (in degrees)
+        return parseInt(compassHeading * ( 180 / Math.PI ));
     }    
-    
+
 }
