@@ -5,6 +5,7 @@ const Geo = require('./modules/Geo');
 /// ********* AR ********* ///
 var vrFrameData,vrDisplay, vrControls, arView; 
 var camera, scene, renderer, reticle;
+var anchorManager, curDevicePos;
 /// ********* -- ********* ///
 
 /// ********* GEO ********* ///
@@ -25,7 +26,7 @@ function init() {
         if (display) {        
             vrFrameData = new VRFrameData();
             vrDisplay = display;        
-            alert('ようこそARの世界へ！ v0.0649');
+            alert('ようこそARの世界へ！ v0.0661');
             initArSystem();            
             initDebugger();
             initHud();
@@ -33,7 +34,6 @@ function init() {
             update();
         } else {        
             THREEAR.ARUtils.displayUnsupportedMessage();
-            geo = new Geo();
         }
     });            
 }
@@ -159,8 +159,7 @@ function poseToString(pose) {
     return pose[0].toFixed(2) + ', ' + pose[1].toFixed(2) + ', ' + pose[2].toFixed(2);
 }
 function updateHud(str) {       
-    hudBitmap.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    //vrFrameData        
+    hudBitmap.clearRect(0, 0, window.innerWidth, window.innerHeight);        
     hudBitmap.fillText(str, window.innerWidth/2, window.innerHeight/2);
     hudTexture.needsUpdate = true;
     counter++;

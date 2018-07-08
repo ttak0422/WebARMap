@@ -4,12 +4,13 @@ module.exports = Geo = function() {
     let self = this;
 
     var watchId = null;
-    var basCrd;
-    var curCrd;        
+    var basCrd;    
+    var curCrd;
+    var basPos;
     var counter = 0;
-    var alpha = -1;
-    var beta  = -1;
-    var gamma = -1;    
+    var compassHeading = 0;
+    var compassAccracy = 0;
+
 
     //TODO: Promise -> async
     function checkReady4GPS(){
@@ -85,8 +86,8 @@ module.exports = Geo = function() {
         return ({x : xM, y : yM});
     }
     async function asyncLatLng2Pos(lat, lng){        
-        const objPoint  = await asyncLatLng2Merc(lat, lng);
-        const basPoint  = await asyncLatLng2Merc(basCrd.latitude, basCrd.longitude);            
+        const objPoint = await asyncLatLng2Merc(lat, lng);
+        const basPoint = await asyncLatLng2Merc(basCrd.latitude, basCrd.longitude);            
         const x = objPoint.x - basPoint.x;
         const y = 1.0 // 適当
         const z = objPoint.y - basPoint.y;        
@@ -100,10 +101,11 @@ module.exports = Geo = function() {
         .then(startWatchPos, function(){ alert('startWatchPos error.') })
         .then(function(){ 
             window.addEventListener("deviceorientation", function(e) {
-                alpha = e.alpha;
-                beta  = e.beta;
-                gamma = e.gamma;
-            }, true);          
+                if (typeof e.webkitCompassHeading !== "undefined") {
+                    compassHeading = e.webkitCompassHeading;
+                    compassAccracy = e.webkitCompassAccuracy;
+                } 
+            });          
             alert("Geo System is Ready!");            
         });
     }
@@ -134,6 +136,7 @@ module.exports = Geo = function() {
     };
 
     self.getCurHeading = function(){
+        //by gps
         return curCrd && curCrd.heading ? curCrd.heading : -1;
     }
 
@@ -142,27 +145,7 @@ module.exports = Geo = function() {
     }
 
     self.getHeading = function(){
-        //参考
-        //http://w3c.github.io/deviceorientation/spec-source-orientation.html#worked-example
-        const degtorad = Math.PI / 180;
-        const _x = beta  ? beta  * degtorad : 0;
-        const _y = gamma ? gamma * degtorad : 0;
-        const _z = alpha ? alpha * degtorad : 0;
-        const cX = Math.cos(_x);
-        const cY = Math.cos(_y);
-        const cZ = Math.cos(_z);
-        const sX = Math.sin(_x);
-        const sY = Math.sin(_y);
-        const sZ = Math.sin(_z);        
-        const Vx = -cZ * sY - sZ * sX * cY;
-        const Vy = -sZ * sY + cZ * sX * cY;        
-        let compassHeading = Math.atan(Vx / Vy);
-        if (Vy < 0) {
-            compassHeading += Math.PI;
-        } else if (Vx < 0) {
-            compassHeading += 2 * Math.PI;
-        }
-        return parseInt(compassHeading * ( 180 / Math.PI ));
+        return parseInt(compassHeading).toString() + parseInt(compassAccracy).toString();
     }    
 
 }
