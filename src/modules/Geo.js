@@ -1,151 +1,143 @@
-module.exports = Geo = function() {   
-    const EARTH_R = 6378137.0;    
-            
-    let self = this;
+const EARTH_R = 6378137.0;
+const ua = navigator.userAgent;
 
-    var watchId = null;
-    var basCrd;    
-    var curCrd;
-    var basPos;
-    var counter = 0;
-    var compassHeading = 0;
-    var compassAccracy = 0;
-
-
-    //TODO: Promise -> async
-    function checkReady4GPS(){
-        return new Promise((resolve, reject) => {
-            if(navigator.geolocation){
-                console.log("your device is ready for gps tracking!");
-                resolve();
-            }else{
-                alert('not suppoered!');
-                reject();
-            }
-        });        
+class Geo {
+    //TODO:コールバック地獄を回避したい
+    //コンストラクタの処理に時間がかかる
+    constructor(callback){
+        console.log("called");
+        this.isIOS =
+            ua.indexOf("iPhone") >= 0 ||
+            ua.indexOf("iPad")   >= 0;
+        this.watchId = null;
+        this.basCrd;
+        this.curCrd;
+        this.counter = 0;
+        this.compassHeading = 0;
+        this.compassAccracy = 0;
+        this.init(callback);
     }
 
-    function getBaseLatLng() {    
-        return new Promise((resolve, reject) => {     
-            navigator.geolocation.getCurrentPosition(
-                function(pos){   
-                    basCrd = pos.coords;  
-                    resolve();
-                },
-                function(err){ 
-                    switch(err.code) {
-                        case 1: //PERMISSION_DENIED
-                            alert("位置情報の利用が許可されていません");
-                            break;
-                        case 2: //POSITION_UNAVAILABLE
-                            alert("現在位置が取得できませんでした");
-                            break;
-                        case 3: //TIMEOUT
-                            alert("タイムアウトになりました");
-                            break;
-                        default:
-                            alert("その他のエラー(エラーコード:"+error.code+")");
-                            break;
-                    }
-                    reject();                    
-                }            
-            );
-        });
-    }    
-
-    function startWatchPos(){     
-        return new Promise((resolve, reject) => {       
-            watchId = navigator.geolocation.watchPosition(        
-                function(pos){  
-                    curCrd = pos.coords;             
-                    counter++;   
-                    console.log(counter + " : " + curCrd.latitude + "," + curCrd.longitude);    
-                    resolve();                                        
-                },
-                function(err){ /* 時々errは起きるが問題はない */ },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 5000,
-                    maximumAge: 0
-                }
-            );      
-            console.log("startWatch : " + watchId);  
-        });
-    }
-    
-    function stopWatchPos(){        
-        geolocation.clearWatch(watchId);
-    }
-
-    async function asyncDeg2rad(deg){ return deg / 180.0 * Math.PI; }    
-    async function asyncLatLng2Merc(lat, lng){
-        const latRad = await asyncDeg2rad(lat);
-        const lngRad = await asyncDeg2rad(lng);
-        const yM = EARTH_R * latRad;
-        const xM = EARTH_R * lngRad;        
-        return ({x : xM, y : yM});
-    }
-    async function asyncLatLng2Pos(lat, lng){        
-        const objPoint = await asyncLatLng2Merc(lat, lng);
-        const basPoint = await asyncLatLng2Merc(basCrd.latitude, basCrd.longitude);            
-        const x = objPoint.x - basPoint.x;
-        const y = 1.0 // 適当
-        const z = objPoint.y - basPoint.y;        
-        return ({x : x, y : y, z : z});
-    }
-    function init(){
-        //TODO:fix 起動と同時にGPSにアクセスするのはだめ
-        // console.log("--- init Geo ---");
-        checkReady4GPS()
-        .then(getBaseLatLng, function(){ alert('getBaseLatLng error.') })
-        .then(startWatchPos, function(){ alert('startWatchPos error.') })
-        .then(function(){ 
+    async init(callback){
+        console.log("initting geo");
+        if(this.isIOS || true){
+            this.basCrd = await this.getBaseLatLng().catch(msg => alert("get base position error : " + msg));
+            this.curCrd = this.basCrd;
             window.addEventListener("deviceorientation", function(e) {
                 if (typeof e.webkitCompassHeading !== "undefined") {
-                    compassHeading = e.webkitCompassHeading;
-                    compassAccracy = e.webkitCompassAccuracy;
-                } 
-            });          
-            alert("Geo System is Ready!");            
+                    this.compassHeading = e.webkitCompassHeading;
+                    this.compassAccracy = e.webkitCompassAccuracy;
+                }
+            });
+            console.log("geo is ready");
+            console.log(
+                this.basCrd.latitude + ", " + this.basCrd.longitude
+            );
+            callback();
+        }else{
+            alert('iOS端末のみをサポートします');
+        }
+    }
+
+    getBaseLatLng(){
+        return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+                function(pos){
+                    resolve(pos.coords);
+                },
+                function(err){
+                    switch(err.code) {
+                        case 1: reject("位置情報の利用が許可されていません");
+                        case 2: reject("現在位置が取得できませんでした");
+                        case 3: reject("タイムアウトになりました");
+                        default:reject("その他のエラー(エラーコード:"+error.code+")");
+                    }
+                }
+            );
         });
     }
 
-    //--- new ----//     
-    init();
-    //--- --- ----//
+    startWatchPos(){
+        watchId = navigator.geolocation.watchPosition(
+            function(pos){
+                this.curCrd = pos.coords;
+                this.counter++;
+                console.log(this.counter + " : " + this.curCrd.latitude + "," + this.curCrd.longitude);
 
-    self.getOffsetPos = async function(){
-        const pos = await asyncLatLng2Pos(basCrd.latitude, bas.longitude);
-        console.log("input  : " + basCrd.latitude + ", " + basCrd.longitude);
-        console.log("output : " + pos.x + ", " + pos.y + ", " + pos.z);
-        return pos;
+            },
+            function(err){ /* 時々errは起きるが問題はない */ },
+            {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            }
+        );
+        console.log("startWatch : " + this.watchId);
     }
 
-    self.getCurPos = async function(){        
-        const pos = await asyncLatLng2Pos(curCrd.latitude, curCrd.longitude);
-        console.log("input  : " + curCrd.latitude + ", " + curCrd.longitude);        
-        console.log("output : " + pos.x + ", " + pos.y + ", " + pos.z);        
-        return pos;
-    };    
+    stopWatchPos(){
+        geolocation.clearWatch(this.watchId);
+    }
 
-    self.debugPos = async function(lat, lng){        
-        const pos = await asyncLatLng2Pos(lat, lng);
-        console.log("input  : " + lat + ", " + lng);        
-        console.log("output : " + pos.x + ", " + pos.y + ", " + pos.z);        
+    async asyncDeg2rad(deg){
+        return deg / 180.0 * Math.PI;
+    }
+
+    async asyncLatLng2Merc(lat, lng){
+        const latRad = await this.asyncDeg2rad(lat);
+        const lngRad = await this.asyncDeg2rad(lng);
+        const yM = EARTH_R * latRad;
+        const xM = EARTH_R * lngRad;
+        return ({x : xM, y : yM});
+    }
+
+    async asyncLatLng2Pos(lat, lng){
+        const objPoint = await this.asyncLatLng2Merc(lat, lng);
+        const basPoint = await this.asyncLatLng2Merc(this.basCrd.latitude, this.basCrd.longitude);
+        const x = objPoint.x - basPoint.x;
+        const y = 1.0 // 適当
+        const z = objPoint.y - basPoint.y;
+        return ({x : x, y : y, z : z});
+    }
+
+    async getBasPos(){
+        while(!this.basCrd){
+            //TODO:fix
+        }
+        return await this.asyncLatLng2Pos(this.basCrd.latitude, this.basCrd.longitude);
+    }
+
+    async getCurPos(){
+        return await this.asyncLatLng2Pos(this.curCrd.latitude, this.curCrd.longitude);
+    };
+
+    async debugPos(lat, lng){
+        const pos = await this.asyncLatLng2Pos(lat, lng);
+        console.log("input  : " + lat + ", " + lng);
+        console.log("output : " + pos.x + ", " + pos.y + ", " + pos.z);
         return pos;
     };
 
-    self.getCurHeading = function(){
-        //by gps
-        return curCrd && curCrd.heading ? curCrd.heading : -1;
+    getCurHeading(){
+        return this.curCrd && this.curCrd.heading ? this.curCrd.heading : -1;
     }
 
-    self.getCounter = function(){
-        return counter;
+    get getCounter(){
+        return this.counter;
     }
 
-    self.getHeading = function(){
-        return parseInt(compassHeading).toString() + parseInt(compassAccracy).toString();
-    }    
+    get getHeading(){
+        return this.compassHeading;
+    }
+
+    get getHeadingAcc(){
+        return this.compassAccracy;
+    }
+
+    get showHeading(){
+        return parseInt("Heading: " + this.compassHeading).toString() + " Acc: " + parseInt(this.compassAccracy).toString();
+    }
 
 }
+
+export default Geo;
