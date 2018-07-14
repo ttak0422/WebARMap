@@ -100,25 +100,15 @@ class Geo {
         return ({x : x, y : y, z : z});
     }
 
-    async getBasPos(){
-        while(!this.basCrd){
-            //TODO:fix
-        }
+    async get asyncGetBasPos(){
         return await this.asyncLatLng2Pos(this.basCrd.latitude, this.basCrd.longitude);
     }
 
-    async getCurPos(){
+    async get asyncGetCurPos(){
         return await this.asyncLatLng2Pos(this.curCrd.latitude, this.curCrd.longitude);
     };
 
-    async debugPos(lat, lng){
-        const pos = await this.asyncLatLng2Pos(lat, lng);
-        console.log("input  : " + lat + ", " + lng);
-        console.log("output : " + pos.x + ", " + pos.y + ", " + pos.z);
-        return pos;
-    };
-
-    getCurHeading(){
+    get getCurHeading(){
         return this.curCrd && this.curCrd.heading ? this.curCrd.heading : -1;
     }
 
