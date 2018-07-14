@@ -100,11 +100,11 @@ class Geo {
         return ({x : x, y : y, z : z});
     }
 
-    async get asyncGetBasPos(){
+    async asyncGetBasPos(){
         return await this.asyncLatLng2Pos(this.basCrd.latitude, this.basCrd.longitude);
     }
 
-    async get asyncGetCurPos(){
+    async asyncGetCurPos(){
         return await this.asyncLatLng2Pos(this.curCrd.latitude, this.curCrd.longitude);
     };
 
