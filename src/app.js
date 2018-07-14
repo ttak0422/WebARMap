@@ -11,6 +11,7 @@ var anchorManager, curDevicePos;
 /// ********* GEO ********* ///
 var geo;
 var offsetPos;
+var angle;
 /// ********* --- ********* ///
 
 /// ********* other ********* ///
@@ -27,12 +28,12 @@ function init() {
         if (display) {
             vrFrameData = new VRFrameData();
             vrDisplay = display;
-            alert('ようこそARの世界へ！ v0.0661');
+            alert('ようこそARの世界へ！ v0.0682');
             initArSystem();
             initDebugger();
             initHud();
             geo = new Geo(async function(){
-                offsetPos = await geo.getBasPos();
+                offsetPos = await geo.asyncGetBasPos();
                 update();
             });
         } else {
@@ -43,7 +44,21 @@ function init() {
 
 function update() {
     updateArSystem();
-    //updateHud(geo.getHeading());
+    const pose = vrFrameData && vrFrameData.pose && vrFrameData.pose.position;
+    const isValidPose =
+        pose &&
+        typeof pose[0] === 'number' &&
+        typeof pose[1] === 'number' &&
+        typeof pose[2] === 'number' &&
+        !(pose[0] === 0 && pose[1] === 0 && pose[2] === 0);
+    if(isValidPose){
+        //return pose[0].toFixed(2) + ', ' + pose[1].toFixed(2) + ', ' + pose[2].toFixed(2);
+        const heading = geo.getHeading() / 180 * Math.PI;
+        const newX = pose[0] * Math.cos(heading) - pose[2] * Math.sin(heading);
+        const newZ = pose[2] * Math.cos(heading) + pose[0] * Math.sin(heading);
+        updateHud('Heading: ' + newX.toFixed(2) + ', ' + pose[1].toFixed(2) + ', ' + newZ.toFixed(2));
+
+    }
 }
 
 function onWindowResize() {
