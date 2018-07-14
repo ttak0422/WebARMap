@@ -1,6 +1,7 @@
 import 'three/VRControls';
 
 import Geo from './modules/Geo';
+import SimpleHud from './modules/SimpleHud';
 
 /// ********* AR ********* ///
 var vrFrameData,vrDisplay, vrControls, arView;
@@ -14,11 +15,13 @@ var offsetPos;
 var angle;
 /// ********* --- ********* ///
 
+/// ********* HUD ********* ///
+var hud;
+/// ********* --- ********* ///
+
 /// ********* other ********* ///
 var arDebugger;
 var reticle;
-var hudCanvas, hudBitmap, hudCamera, hudTexture, hudMaterial;
-var planeGeometry, plane, hudScene;
 /// ********* ----- ********* ///
 
 init();
@@ -31,7 +34,7 @@ function init() {
             alert('ようこそARの世界へ！ v0.0682');
             initArSystem();
             initDebugger();
-            initHud();
+            hud = new SimpleHud(renderer);
             geo = new Geo(async function(){
                 offsetPos = await geo.asyncGetBasPos();
                 update();
@@ -52,12 +55,10 @@ function update() {
         typeof pose[2] === 'number' &&
         !(pose[0] === 0 && pose[1] === 0 && pose[2] === 0);
     if(isValidPose){
-        //return pose[0].toFixed(2) + ', ' + pose[1].toFixed(2) + ', ' + pose[2].toFixed(2);
         const heading = geo.getHeading() / 180 * Math.PI;
         const newX = pose[0] * Math.cos(heading) - pose[2] * Math.sin(heading);
         const newZ = pose[2] * Math.cos(heading) + pose[0] * Math.sin(heading);
-        updateHud('Heading: ' + newX.toFixed(2) + ', ' + pose[1].toFixed(2) + ', ' + newZ.toFixed(2));
-
+        hud.update('Heading: ' + newX.toFixed(2) + ', ' + pose[1].toFixed(2) + ', ' + newZ.toFixed(2));
     }
 }
 
@@ -149,38 +150,3 @@ function updateReticle() {
     reticle.update(0.5, 0.5);
 }
 /// ********* _______ ********* ///
-
-/// ********* HUD ********* ///
-function initHud() {
-    let width  = window.innerWidth;
-    let height = window.innerHeight;
-    hudCanvas  = document.createElement('canvas');
-    hudCanvas.width  = width;
-    hudCanvas.height = height;
-    hudBitmap = hudCanvas.getContext('2d');
-    hudBitmap.font = "Normal 30px Arial";
-    hudBitmap.textAlign = 'center';
-    hudBitmap.fillStyle = 'rgba(245, 245, 245, 0.9)';
-    hudBitmap.fillText('Initializing...', width / 2, height / 2);
-    hudCamera  = new THREE.OrthographicCamera(-width/2, width/2, height/2, -height/2, 0, 30);
-    hudScene   = new THREE.Scene();
-    hudTexture = new THREE.Texture(hudCanvas);
-    hudTexture.needsUpdate = true;
-    hudMaterial = new THREE.MeshBasicMaterial({map: hudTexture});
-    hudMaterial.transparent = true; //重そう
-    planeGeometry = new THREE.PlaneGeometry(width, height);
-    plane = new THREE.Mesh(planeGeometry, hudMaterial);
-    hudScene.add(plane);
-}
-var counter = 0; //フレーム数(動作確認用)
-function poseToString(pose) {
-    return pose[0].toFixed(2) + ', ' + pose[1].toFixed(2) + ', ' + pose[2].toFixed(2);
-}
-function updateHud(str) {
-    hudBitmap.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    hudBitmap.fillText(str, window.innerWidth/2, window.innerHeight/2);
-    hudTexture.needsUpdate = true;
-    counter++;
-    renderer.render(hudScene, hudCamera);
-}
-/// ********* ___ ********* ///
