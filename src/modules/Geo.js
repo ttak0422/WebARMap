@@ -8,7 +8,6 @@ module.exports = Geo = function(callback){
     var watchId = null;
     var basCrd;
     var curCrd;
-    var counter = 0;
     var compassHeading = -1;
     var compassAccracy = -1;
 
@@ -19,7 +18,6 @@ module.exports = Geo = function(callback){
             basCrd = await getBaseLatLng().catch(msg => alert("get base position error : " + msg));
             curCrd = basCrd;
             window.addEventListener("deviceorientation", function(e) {
-                counter += 1;
                 if (typeof e.webkitCompassHeading !== "undefined"){
                     compassHeading = e.webkitCompassHeading;
                     compassAccracy = e.webkitCompassAccuracy;
