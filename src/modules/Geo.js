@@ -47,10 +47,7 @@ module.exports = Geo = function(callback){
 
     function startWatchPos(){
         watchId = navigator.geolocation.watchPosition(
-            function(pos){
-                curCrd = pos.coords;
-                counter++;
-            },
+            function(pos){ curCrd = pos.coords; },
             function(err){ /* 時々errは起きるが問題はない */ },
             {
                 enableHighAccuracy: true,
