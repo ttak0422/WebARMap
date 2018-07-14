@@ -10,10 +10,9 @@ module.exports = {
         filename: 'bundle.js'
     },
     resolve: {
-        // 使用したいコントロールやレンダラを定義しておきます。(下記は一例です。)
-        alias: {            
-            //// カメラ制御
-            //'three/OrbitControls': path.join(__dirname, 'node_modules/three/examples/js/controls/OrbitControls.js'),
+        alias: {                        
+            'three/VRControls': path.join(__dirname, 'node_modules/three/examples/js/controls/VRControls.js'),
+            'three/GLTFLoader': path.join(__dirname, 'node_modules/three/examples/js/loaders/GLTFLoader.js')
         }
     },
     plugins: [
