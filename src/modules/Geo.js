@@ -90,6 +90,10 @@ module.exports = Geo = function(callback){
         return await asyncLatLng2Pos(curCrd.latitude, curCrd.longitude);
     }
 
+    self.asyncGetLatLng2Pos = async function(lat, lng){
+        return await asyncLatLng2Pos(lat, lng);
+    }
+
     self.getCurHeading = function(){
         return curCrd && curCrd.heading ? curCrd.heading : -1;
     }
