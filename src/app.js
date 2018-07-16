@@ -5,7 +5,8 @@ import SimpleHud from './modules/SimpleHud';
 
 /// ********* AR ********* ///
 var vrFrameData,vrDisplay, vrControls, arView;
-var camera, scene, renderer, reticle;
+var cam, camGroup;
+var scene, renderer, reticle;
 var anchorManager, curDevicePos;
 /// ********* -- ********* ///
 
@@ -22,6 +23,9 @@ var hud;
 /// ********* other ********* ///
 var arDebugger;
 var reticle;
+var frame = 0;
+var cameraman;
+
 /// ********* ----- ********* ///
 
 init();
@@ -31,12 +35,18 @@ function init() {
         if (display) {
             vrFrameData = new VRFrameData();
             vrDisplay = display;
-            alert('ようこそARの世界へ！ v0.0682');
+            alert('ようこそARの世界へ！ v0.07014');
             initArSystem();
             initDebugger();
             hud = new SimpleHud(renderer);
             geo = new Geo(async function(){
                 offsetPos = await geo.asyncGetBasPos();
+
+                camGroup.position.set(100,100,100);
+                camGroup.add(cam);
+                scene.add(camGroup);
+                const pos = cam.getWorldPosition();
+                alert('pos: ' + pos.x.toFixed(2) + ', ' + pos.y.toFixed(2) + ', ' + pos.z.toFixed(2));
                 update();
             });
         } else {
@@ -47,24 +57,13 @@ function init() {
 
 function update() {
     updateArSystem();
-    const pose = vrFrameData && vrFrameData.pose && vrFrameData.pose.position;
-    const isValidPose =
-        pose &&
-        typeof pose[0] === 'number' &&
-        typeof pose[1] === 'number' &&
-        typeof pose[2] === 'number' &&
-        !(pose[0] === 0 && pose[1] === 0 && pose[2] === 0);
-    if(isValidPose){
-        const heading = geo.getHeading() / 180 * Math.PI;
-        const newX = pose[0] * Math.cos(heading) - pose[2] * Math.sin(heading);
-        const newZ = pose[2] * Math.cos(heading) + pose[0] * Math.sin(heading);
-        hud.update('Heading: ' + newX.toFixed(2) + ', ' + pose[1].toFixed(2) + ', ' + newZ.toFixed(2));
-    }
+    let pos = cam.getWorldPosition();
+    hud.update('pos: ' + pos.x.toFixed(2) + ', ' + pos.y.toFixed(2) + ', ' + pos.z.toFixed(2));
 }
 
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    cam.aspect = window.innerWidth / window.innerHeight;
+    cam.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
@@ -108,14 +107,15 @@ function initArSystem() {
     scene  = new THREE.Scene();
     arView = new THREEAR.ARView(vrDisplay, renderer);
     anchorManager = new THREEAR.ARAnchorManager(vrDisplay);
-    camera = new THREEAR.ARPerspectiveCamera(
+    cam = new THREEAR.ARPerspectiveCamera(
                 vrDisplay,
                 60, //fov
                 window.innerWidth / window.innerHeight,
                 vrDisplay.depthNear,
-                vrDisplay.depthFar
+                2000 //vrDisplay.depthFar
             );
-    vrControls = new THREE.VRControls(camera);
+    camGroup = new THREE.Group();
+    vrControls = new THREE.VRControls(cam); //カメラの移動について上書き
     document.body.appendChild(renderer.domElement);
 
     window.addEventListener('resize', onWindowResize, false);
@@ -124,11 +124,11 @@ function initArSystem() {
 function updateArSystem() {
     renderer.clearColor();
     arView.render();
-    camera.updateProjectionMatrix();
+    cam.updateProjectionMatrix();
     vrDisplay.getFrameData(vrFrameData);
     vrControls.update();
     renderer.clearDepth();
-    renderer.render(scene, camera);
+    renderer.render(scene, cam);
     curDevicePos = vrFrameData.pose.position;
     vrDisplay.requestAnimationFrame(update);
 }

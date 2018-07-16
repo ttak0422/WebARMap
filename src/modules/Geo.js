@@ -14,7 +14,7 @@ module.exports = Geo = function(callback){
     init(callback);
 
     async function init(callback){
-        if(isIOS){
+        if(isIOS || true){
             basCrd = await getBaseLatLng().catch(msg => alert("get base position error : " + msg));
             curCrd = basCrd;
             window.addEventListener("deviceorientation", function(e) {
