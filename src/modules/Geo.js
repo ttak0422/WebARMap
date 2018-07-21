@@ -1,35 +1,50 @@
 module.exports = Geo = function(callback){
+
     const self = this;
-    const EARTH_R = 6378137.0;
+    const cb = callback;
     const ua = navigator.userAgent;
     const isIOS =
         ua.indexOf("iPhone") >= 0 ||
         ua.indexOf("iPad")   >= 0;
+    const EARTH_R = 6378137.0;
+
     var watchId = null;
     var basCrd;
     var curCrd;
-    var compassHeading = -1;
+    var basHeading = -1;
+    var curHeading = -1;
     var compassAccracy = -1;
 
-    init(callback);
+    window.addEventListener("deviceorientation", function(e) {
+        if (typeof e.webkitCompassHeading !== "undefined"){
+            curHeading = e.webkitCompassHeading;
+            compassAccracy = e.webkitCompassAccuracy;
+        }
+    });
 
-    async function init(callback){
-        if(isIOS || true){
-            basCrd = await getBaseLatLng().catch(msg => alert("get base position error : " + msg));
+    window.onload = function(){
+        //0.5秒ごとに方角が検出できているか確認
+        //大方一発目で認識できるはず
+        const getBasHeading = this.setInterval(function(){
+            if(curHeading !=- 1){
+                basHeading = curHeading;
+                clearInterval(getBasHeading);
+                init();
+            }
+        }, 500);
+    }
+
+    async function init(){
+        if(isIOS){
+            basCrd = await getBasLatLng().catch(msg => alert("get base position error : " + msg));
             curCrd = basCrd;
-            window.addEventListener("deviceorientation", function(e) {
-                if (typeof e.webkitCompassHeading !== "undefined"){
-                    compassHeading = e.webkitCompassHeading;
-                    compassAccracy = e.webkitCompassAccuracy;
-                }
-            });
-            callback();
+            cb();
         }else{
             alert('iOS端末のみをサポートします');
         }
     }
 
-    function getBaseLatLng(){
+    function getBasLatLng(){
         return new Promise((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(
                 function(pos){ resolve(pos.coords); },
@@ -82,28 +97,40 @@ module.exports = Geo = function(callback){
         return ({x : x, y : y, z : z});
     }
 
-    self.asyncGetBasPos = async function(){
+    function getBasHeading(){
+        return basHeading < 0 ? basHeading + 360 : basHeading;
+    }
+
+    self.AsyncGetBasPos = async function(){
         return await asyncLatLng2Pos(basCrd.latitude, basCrd.longitude);
     }
 
-    self.asyncGetCurPos = async function(){
+    self.AsyncGetCurPos = async function(){
         return await asyncLatLng2Pos(curCrd.latitude, curCrd.longitude);
     }
 
-    self.asyncGetLatLng2Pos = async function(lat, lng){
+    self.AsyncGetLatLng2Pos = async function(lat, lng){
         return await asyncLatLng2Pos(lat, lng);
     }
 
-    self.getCurHeading = function(){
+    self.GetCurHeading = function(){
         return curCrd && curCrd.heading ? curCrd.heading : -1;
     }
 
-    self.getHeading = function(){
-        return compassHeading;
+    self.GetBasHeading = function(){
+        return getBasHeading();
     }
 
-    self.getHeadingAcc = function(){
+    self.GetHeading = function(){
+        return curHeading;
+    }
+
+    self.GetHeadingAcc = function(){
         return compassAccracy;
+    }
+
+    self.GetDiffFromNorth = function(){
+        return getBasHeading();
     }
 
 }
