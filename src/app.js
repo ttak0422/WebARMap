@@ -40,7 +40,7 @@ function init() {
         if (display) {
             vrDisplay = display;
             vrFrameData = new VRFrameData();
-            alert('ようこそARの世界へ！ v0.1');
+            alert('ようこそARの世界へ！ v0.101');
             initArSystem();
             initDebugger();
             hud = new SimpleHud(renderer);
@@ -121,13 +121,15 @@ function updateArSystem() {
     cam.updateProjectionMatrix();
     vrDisplay.getFrameData(vrFrameData);
     vrControls.update();
+    const trackPos = trackObj.position;
     const trackPosRecalcX = trackPos.x * Math.cos(heading) - trackPos.z * Math.sin(heading);
     const trackPosRecalcZ = trackPos.z * Math.cos(heading) + trackPos.x * Math.sin(heading);
     cam.position.set(
         trackPosRecalcX,
-        0,
+        trackPos.y,
         trackPosRecalcZ
     );
+    cam.applyQuaternion(trackObj.quaternion);
     renderer.clearDepth();
     renderer.render(scene, cam);
     curDevicePos = vrFrameData.pose.position;
