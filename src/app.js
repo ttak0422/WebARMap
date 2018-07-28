@@ -24,6 +24,12 @@ var hud;
 /// ********* --- ********* ///
 
 /// ********* other ********* ///
+var geometry = new THREE.BoxGeometry(0.1,0.1,0.1);
+var material = new THREE.MeshPhongMaterial( { color: '#ffffff' } );
+var cube = new THREE.Mesh( geometry, material );
+    cube.position.set(1000, 1000, 1000);
+    scene.add(cube);
+var standingMatrix = new THREE.Matrix4();
 var arDebugger;
 var reticle;
 var heading = 0;
@@ -40,9 +46,12 @@ function init() {
         if (display) {
             vrDisplay = display;
             vrFrameData = new VRFrameData();
-            alert('ようこそARの世界へ！ v0.101');
+            alert('ようこそARの世界へ！ v0.102');
             initArSystem();
             initDebugger();
+
+            cube.position.set(0, 0, 2);
+
             hud = new SimpleHud(renderer);
             geo = new Geo(async function(){
                 offsetPos = await geo.AsyncGetBasPos();
@@ -108,11 +117,12 @@ function initArSystem() {
         vrDisplay.depthNear,
         2000 //vrDisplay.depthFar
     );
-
+    cam.useQuaternion = true;
     vrControls = new THREE.VRControls(trackObj);
     document.body.appendChild(renderer.domElement);
     window.addEventListener('resize', onWindowResize, false);
     window.addEventListener('touchstart', onClick, false);
+
 }
 
 function updateArSystem() {
@@ -121,15 +131,32 @@ function updateArSystem() {
     cam.updateProjectionMatrix();
     vrDisplay.getFrameData(vrFrameData);
     vrControls.update();
+    //カメラの位置の更新
     const trackPos = trackObj.position;
     const trackPosRecalcX = trackPos.x * Math.cos(heading) - trackPos.z * Math.sin(heading);
     const trackPosRecalcZ = trackPos.z * Math.cos(heading) + trackPos.x * Math.sin(heading);
+    const pose = vrFrameData.pose;
+    //cam.position.fromArray(pose.position);
+    cam.position.fromArray(trackPos);
+    cam.quaternion.fromArray(pose.orientation);
     cam.position.set(
         trackPosRecalcX,
         trackPos.y,
         trackPosRecalcZ
     );
-    cam.applyQuaternion(trackObj.quaternion);
+    //カメラの回転の更新
+
+    //cam.updateMatrix();
+
+
+
+    // const trackRot = trackObj.rotation;
+    // cam.rotation.set(
+    //     trackRot.x,
+    //     trackRot.y,
+    //     trackRot.z
+    // );
+
     renderer.clearDepth();
     renderer.render(scene, cam);
     curDevicePos = vrFrameData.pose.position;
