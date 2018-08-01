@@ -8,11 +8,9 @@ module.exports = Geo = function(callback){
         ua.indexOf("iPad")   >= 0;
     const EARTH_R = 6378137.0;
 
-    var watchId = null;
     var basCrd;
-    var curCrd;
+    var basPoint;
     var basHeading = -1;
-    var curHeading = -1;
     var compassAccracy = -1;
 
     window.addEventListener("deviceorientation", function(e) {
@@ -37,6 +35,7 @@ module.exports = Geo = function(callback){
     async function init(){
         if(isIOS){
             basCrd = await getBasLatLng().catch(msg => alert("get base position error : " + msg));
+            basPoint = await asyncLatLng2Merc(basCrd.latitude, basCrd.longitude);
             curCrd = basCrd;
             cb();
         }else{
@@ -60,22 +59,6 @@ module.exports = Geo = function(callback){
         });
     }
 
-    function startWatchPos(){
-        watchId = navigator.geolocation.watchPosition(
-            function(pos){ curCrd = pos.coords; },
-            function(err){ /* 時々errは起きるが問題はない */ },
-            {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 0
-            }
-        );
-    }
-
-    function stopWatchPos(){
-        geolocation.clearWatch(watchId);
-    }
-
     async function asyncDeg2rad(deg){
         return deg / 180.0 * Math.PI;
     }
@@ -90,7 +73,7 @@ module.exports = Geo = function(callback){
 
     async function asyncLatLng2Pos(latDeg, lngDeg){
         const objPoint = await asyncLatLng2Merc(latDeg, lngDeg);
-        const basPoint = await asyncLatLng2Merc(basCrd.latitude, basCrd.longitude);
+        //const basPoint = await asyncLatLng2Merc(basCrd.latitude, basCrd.longitude);
         const x = objPoint.x - basPoint.x;
         const y = 1.0 // 適当
         const z = objPoint.y - basPoint.y;
@@ -105,16 +88,8 @@ module.exports = Geo = function(callback){
         return await asyncLatLng2Pos(basCrd.latitude, basCrd.longitude);
     }
 
-    self.AsyncGetCurPos = async function(){
-        return await asyncLatLng2Pos(curCrd.latitude, curCrd.longitude);
-    }
-
     self.AsyncGetLatLng2Pos = async function(lat, lng){
         return await asyncLatLng2Pos(lat, lng);
-    }
-
-    self.GetCurHeading = function(){
-        return curCrd && curCrd.heading ? curCrd.heading : -1;
     }
 
     self.GetBasHeading = function(){
@@ -127,10 +102,6 @@ module.exports = Geo = function(callback){
 
     self.GetHeadingAcc = function(){
         return compassAccracy;
-    }
-
-    self.GetDiffFromNorth = function(){
-        return getBasHeading();
     }
 
 }
