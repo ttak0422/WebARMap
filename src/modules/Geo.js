@@ -1,8 +1,17 @@
 module.exports = Geo = function(callback){
-
     const self = this;
+
+    /**
+     * 以後の処理を行うにあたって，センサで初期値を取得している必要がある
+     * 処理を呼び出すものはcallback以後に
+     */
     const cb = callback;
     const ua = navigator.userAgent;
+
+    /**
+     * ブラウザ上でコンパスを利用できるのが現状iOSのみであるため
+     * iOSのみをサポートすることにする
+     */
     const isIOS =
         ua.indexOf("iPhone") >= 0 ||
         ua.indexOf("iPad")   >= 0;
@@ -20,9 +29,11 @@ module.exports = Geo = function(callback){
         }
     });
 
+    /**
+     * 0.5秒ごとに方角が検出できているか確認
+     * 確認出来次第，次のステップへ移行
+     */
     window.onload = function(){
-        //0.5秒ごとに方角が検出できているか確認
-        //大方一発目で認識できるはず
         const getBasHeading = this.setInterval(function(){
             if(curHeading !=- 1){
                 basHeading = curHeading;
@@ -34,9 +45,9 @@ module.exports = Geo = function(callback){
 
     async function init(){
         if(isIOS){
-            basCrd = await getBasLatLng().catch(msg => alert("get base position error : " + msg));
+            basCrd   = await getBasLatLng().catch(msg => alert("get base position error : " + msg));
             basPoint = await asyncLatLng2Merc(basCrd.latitude, basCrd.longitude);
-            curCrd = basCrd;
+            curCrd   = basCrd;
             cb();
         }else{
             alert('iOS端末のみをサポートします');
@@ -52,7 +63,7 @@ module.exports = Geo = function(callback){
                         case 1: reject("位置情報の利用が許可されていません");
                         case 2: reject("現在位置が取得できませんでした");
                         case 3: reject("タイムアウトになりました");
-                        default:reject("その他のエラー(エラーコード:"+error.code+")");
+                        default:reject("その他のエラー(エラーコード:" + error.code+")");
                     }
                 }
             );

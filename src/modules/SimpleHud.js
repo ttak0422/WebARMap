@@ -1,4 +1,4 @@
-/*
+/**
  * 簡単なデバッグ用に画面中央にテキストを表示するだけ
  */
 module.exports = SimpleHud = function(renderer){
@@ -39,6 +39,8 @@ module.exports = SimpleHud = function(renderer){
         self.width  = window.innerWidth;
         self.posY = height / 2;
         self.posX = width / 2;
+        hudCanvas.width  = width;
+        hudCanvas.height = height;
     }
 
 }
