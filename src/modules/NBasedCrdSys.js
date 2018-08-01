@@ -4,6 +4,7 @@
 
 module.exports = NBasedCrdSys = function(scene,cam,callback){
     const self = this;
+
     const vrControls = new THREE.VRControls(cam);
     /**
      * 北を基準をする座標系
@@ -31,6 +32,10 @@ module.exports = NBasedCrdSys = function(scene,cam,callback){
         return deg / 180 * Math.PI;
     }
 
+    function pos2str(pos) {
+        return 'pos: ' + pos.x.toFixed(2) + ', ' + pos.y.toFixed(2) + ', ' + pos.z.toFixed(2);
+    }
+
     self.update = function(){
         vrControls.update();
     }
@@ -38,5 +43,11 @@ module.exports = NBasedCrdSys = function(scene,cam,callback){
     self.add = function(obj){
         northBasedCoordinateSystem.add(obj);
     }
-}
 
+    self.add2LatLng = async function(obj, lat, lng){
+        northBasedCoordinateSystem.add(obj);
+        const pos = await geo.AsyncGetLatLng2Pos(lat, lng);
+        alert(pos2str(pos));
+        obj.position.set(pos.x, pos.y, pos.z);
+    }
+}
