@@ -1,4 +1,4 @@
-const msg = 'ようこそARの世界へ！@1.5';
+const msg = 'ようこそARの世界へ！@1.61';
 
 //TODO:モジュールのインポート方法の改善
 //NBasedCrdSysで使用するモジュール
@@ -14,14 +14,20 @@ const scene    = new THREE.Scene();
 let vrFrameData, vrDisplay, arView, anchorManager;
 let nSystem;
 let cam;
-
+const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+scene.add(ambient);
 /// ********* for debug ********* ///
 let hud;
-const cubeSize = 0.30;
-const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
-const material = new THREE.MeshPhongMaterial( { color: '#ffffff' } );
-const cube1 = new THREE.Mesh( geometry, material );
-const cube2 = new THREE.Mesh( geometry, material );
+const cubeSize0 = 30;
+const cubeSize1 = 0.30;
+const geometry0 = new THREE.BoxGeometry(cubeSize0, cubeSize0, cubeSize0);
+const geometry1 = new THREE.BoxGeometry(cubeSize1, cubeSize1, cubeSize1);
+const materialW = new THREE.MeshPhongMaterial( { color: '#ffffff' } );
+const materialR = new THREE.MeshPhongMaterial( { color: '#ff0000' } );
+const cube0Lib = new THREE.Mesh( geometry0, materialW );
+const cube0Lab = new THREE.Mesh( geometry0, materialR );
+const cube1 = new THREE.Mesh( geometry1, materialW );
+const cube2 = new THREE.Mesh( geometry1, materialW );
 let arDebugger;
 function pos2str(pos) {
     return 'pos: ' + pos.x.toFixed(2) + ', ' + pos.y.toFixed(2) + ', ' + pos.z.toFixed(2);
@@ -42,13 +48,14 @@ function init() {
             document.body.appendChild(arDebugger.getElement());
 
             hud     = new SimpleHud(renderer);
-            nSystem = new NBasedCrdSys(scene, cam, update);
+            nSystem = new NBasedCrdSys(scene, cam, init2);
 
             //キューブを北に習って配置
-            nSystem.add(cube1);
-            nSystem.add(cube2);
-            cube1.position.set(0, 0, -1);
-            cube2.position.set(0, 0, -2);
+            // nSystem.add(cube1);
+            // nSystem.add(cube2);
+            // cube1.position.set(0, 0, -1);
+            // cube2.position.set(0, 0, -2);
+            //nSystem.add2LatLng(cube0, 34.403223, 132.713519);
 
             window.addEventListener('resize', onWindowResize, false);
             window.addEventListener('touchstart', onClick, false);
@@ -56,6 +63,12 @@ function init() {
             THREEAR.ARUtils.displayUnsupportedMessage();
         }
     });
+}
+
+function init2(){
+    nSystem.add2LatLng(cube0Lib, 34.403223, 132.713519);
+    //nSystem.add2LatLng(cube0Lab, 34.408760, 132.714022);
+    update()
 }
 
 function update() {
