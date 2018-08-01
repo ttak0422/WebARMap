@@ -73,9 +73,8 @@ module.exports = Geo = function(callback){
 
     async function asyncLatLng2Pos(latDeg, lngDeg){
         const objPoint = await asyncLatLng2Merc(latDeg, lngDeg);
-        //const basPoint = await asyncLatLng2Merc(basCrd.latitude, basCrd.longitude);
         const x = objPoint.x - basPoint.x;
-        const y = 1.0 // 適当
+        const y = 0 // 適当
         const z = objPoint.y - basPoint.y;
         return ({x : x, y : y, z : z});
     }
