@@ -35,9 +35,9 @@ function pos2str(pos) {
     return 'pos: ' + pos.x.toFixed(2) + ', ' + pos.y.toFixed(2) + ', ' + pos.z.toFixed(2);
 }
 
-init();
+awake();
 
-function init() {
+function awake() {
     THREEAR.ARUtils.getARDisplay().then(async function (display) {
         if (display) {
             alert(msg);
@@ -49,7 +49,7 @@ function init() {
             arDebugger = new THREEAR.ARDebug(vrDisplay,scene);
             document.body.appendChild(arDebugger.getElement());
 
-            nSystem = new NBasedCrdSys(scene, cam, init2);
+            nSystem = new NBasedCrdSys(scene, cam, start);
 
             window.addEventListener('resize', onWindowResize, false);
             window.addEventListener('touchstart', onClick, false);
@@ -59,7 +59,7 @@ function init() {
     });
 }
 
-function init2(){
+function start(){
     //キューブを北にならって配置
     nSystem.add(cube1);
     nSystem.add(cube2);
