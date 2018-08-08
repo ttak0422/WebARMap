@@ -10,9 +10,10 @@ module.exports = {
         filename: 'bundle.js'
     },
     resolve: {
-        alias: {                        
+        alias: {
             'three/VRControls': path.join(__dirname, 'node_modules/three/examples/js/controls/VRControls.js'),
-            'three/GLTFLoader': path.join(__dirname, 'node_modules/three/examples/js/loaders/GLTFLoader.js')
+            'three/GLTFLoader': path.join(__dirname, 'node_modules/three/examples/js/loaders/GLTFLoader.js'),
+            'three/examples/js/renderers/CSS3DRenderer.js': path.join(__dirname, 'three/examples/js/renderers/CSS3DRenderer.js')
         }
     },
     plugins: [
