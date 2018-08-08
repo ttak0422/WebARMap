@@ -4,7 +4,6 @@ const msg = 'ようこそARの世界へ！@1.61';
 //NBasedCrdSysで使用するモジュール
 import 'three/VRControls';
 import Geo from './modules/Geo';
-//
 
 import NBasedCrdSys from './modules/NBasedCrdSys';
 import SimpleHud    from './modules/SimpleHud';
@@ -27,19 +26,28 @@ const geometry1 = new THREE.BoxGeometry(cubeSize1, cubeSize1, cubeSize1);
 const materialW = new THREE.MeshPhongMaterial( { color: '#ffffff' } );
 const materialR = new THREE.MeshPhongMaterial( { color: '#ff0000' } );
 const cube0Lib  = new THREE.Mesh( geometry0, materialW );
-const cube0Lab  = new THREE.Mesh( geometry0, materialR );
+const cube0Lab  = new THREE.Mesh( geometry1, materialR );
 const cube1     = new THREE.Mesh( geometry1, materialW );
 const cube2     = new THREE.Mesh( geometry1, materialR );
+cube1.name = 'white_cube';
+cube2.name = 'red_cube';
 let arDebugger;
+function log(msg){
+    console.log("[app] " + msg);
+}
 function pos2str(pos) {
-    return 'pos: ' + pos.x.toFixed(2) + ', ' + pos.y.toFixed(2) + ', ' + pos.z.toFixed(2);
+    return `pos: ${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)}`;
 }
 
 awake();
 
 function awake() {
+    log("awake called");
+
     THREEAR.ARUtils.getARDisplay().then(async function (display) {
         if (display) {
+            log("your device is ready for our app!");
+
             alert(msg);
             vrDisplay   = display;
             vrFrameData = new VRFrameData();
@@ -54,18 +62,21 @@ function awake() {
             window.addEventListener('resize', onWindowResize, false);
             window.addEventListener('touchstart', onClick, false);
         } else {
+            log("your device is not supported!")
             THREEAR.ARUtils.displayUnsupportedMessage();
         }
     });
 }
 
 function start(){
+    log("start called");
     //キューブを北にならって配置
-    nSystem.add(cube1);
-    nSystem.add(cube2);
-    cube1.position.set(0, 0, -1);
-    cube2.position.set(0, 0, -2);
-    nSystem.add2LatLng(cube0Lib, 34.403223, 132.713519);
+    // nSystem.add(cube1);
+    // nSystem.add(cube2);
+    // cube1.position.set(0, 0, -1);
+    // cube2.position.set(0, 0, -2);
+    nSystem.add2LatLng(cube0Lib, 34.403058, 132.714301);
+    nSystem.add2LatLng(cube0Lab, 34.40186953458748, 132.71486369469042);
     update()
 }
 
@@ -113,6 +124,10 @@ function arUpdate() {
     vrDisplay.requestAnimationFrame(update);
 }
 
+/**
+ * タップした地点の座標を取得
+ * @param {*} e event
+ */
 async function singletap(e){
     const hitX = e.touches[0].pageX / window.innerWidth;
     const hitY = e.touches[0].pageY / window.innerHeight;
@@ -123,9 +138,10 @@ async function singletap(e){
         const x = mm[12];
         const y = mm[13];
         const z = mm[14];
-        console.log(x + " " + y + " " + z);
+        log(`tapped pos: ${x}, ${y}, ${z}`)
     }
 }
 
 async function doubletap(e){
+    nSystem.Test();
 }
