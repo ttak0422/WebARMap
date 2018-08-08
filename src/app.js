@@ -71,12 +71,12 @@ function awake() {
 function start(){
     log("start called");
     //キューブを北にならって配置
-    // nSystem.add(cube1);
-    // nSystem.add(cube2);
-    // cube1.position.set(0, 0, -1);
-    // cube2.position.set(0, 0, -2);
-    nSystem.add2LatLng(cube0Lib, 34.403058, 132.714301);
-    nSystem.add2LatLng(cube0Lab, 34.40186953458748, 132.71486369469042);
+    nSystem.add(cube1);
+    nSystem.add(cube2);
+    cube1.position.set(0, 0, -1);
+    cube2.position.set(0, 0, -2);
+    // nSystem.add2LatLng(cube0Lib, 34.403058, 132.714301);
+    // nSystem.add2LatLng(cube0Lab, 34.40186953458748, 132.71486369469042);
     update()
 }
 
