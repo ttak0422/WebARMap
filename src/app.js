@@ -50,6 +50,9 @@ function awake(){
                 2000 //vrDisplay.depthFar
             );
 
+            window.addEventListener('resize', onWindowResized, false);
+            window.addEventListener('touchstart', onClick, false);
+
             arSystem = new ARSystem(scene, cam, start);
         }else{
             console.log('your device is not supported!');
@@ -92,7 +95,7 @@ function onClick(e){
 
 async function singletap(e){
     console.log('single touched');
-
+    arSystem.UpdateHeading();
 }
 
 async function doubletap(e){
