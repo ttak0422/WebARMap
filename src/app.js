@@ -1,10 +1,10 @@
 const msg = 'ようこそARの世界へ';
 
 import 'three/VRControls';
-
 import Gps from './modules/Gps';
 import Compass from './modules/Compass';
 import CrdConverter from './modules/CrdConverter';
+
 import ARSystem from './modules/ARSystem';
 
 // *** THREE ***
@@ -13,8 +13,8 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.autoClear = false;
 document.body.appendChild(renderer.domElement);
-const scene    = new THREE.Scene();
-const ambient  = new THREE.AmbientLight(0xffffff, 0.7);
+const scene   = new THREE.Scene();
+const ambient = new THREE.AmbientLight(0xffffff, 0.7);
 scene.add(ambient);
 let vrFrameData, vrDisplay, arView, anchorManager;
 let arSystem;
@@ -91,7 +91,11 @@ function onClick(e){
 }
 
 async function singletap(e){
+    console.log('single touched');
+
 }
 
 async function doubletap(e){
+    console.log('double touched');
+
 }
