@@ -1,4 +1,4 @@
-module.exports = Compass = function(){
+module.exports = Compass = () => {
     const self = this;
 
     const ua = navigator.userAgent;
@@ -29,25 +29,20 @@ module.exports = Compass = function(){
      * number -> number
      * @param {Number} deg
      */
-    function convertDeg(deg){
-        return deg < 0 ? deg + 360 : deg;
-    }
+    const convertDeg = (deg) => deg < 0 ? deg + 360 : deg;
 
-    self.StartWatchiHeading = function(){
-        window.addEventListener("deviceorientation", function(e) {
+    self.StartWatchiHeading = () => {
+        window.addEventListener("deviceorientation", (e) => {
             if (typeof e.webkitCompassHeading !== "undefined"){
                 heading  = e.webkitCompassHeading;
                 accuracy = e.webkitCompassAccuracy;
             }
         });
-    }
+    };
 
-    self.GetHeading = function(){
-        return convertDeg(heading);
-    }
+    self.GetHeading  = () => convertDeg(heading);
 
-    self.GetAccuracy = function(){
-        return accuracy;
-    }
+    self.GetAccuracy = () => accuracy;
 
-}
+
+};
