@@ -116,7 +116,7 @@ module.exports = ARSystem = function(scene, cam, callback){
         console.log(`更新前 ${crdConv.Pos2Str(dBasSys.position)}`);
 
         const gPos = await crdConv.AsyncLatLng2Poition(newLat, newLng);
-        const aPos = cam.position;
+        const aPos = cam.getWorldPosition();
         const dPos = {
             x: gPos.x - aPos.x,
             y: gPos.y - aPos.y,
