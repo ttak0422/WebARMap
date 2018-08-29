@@ -1,4 +1,4 @@
-module.exports = Gps = () => {
+module.exports = Gps = function(){
     const self = this;
 
     /**
@@ -57,4 +57,4 @@ module.exports = Gps = () => {
 
     self.StopWatchiLatLng = () => geolocation.clearWatchi(watchId);
 
-};
+}

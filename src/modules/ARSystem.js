@@ -2,7 +2,7 @@
  * ARControlsは初期データの取得に，不定時間かかる．
  * オブジェクトの配置などはcallback関数以後に実行する．
  */
-module.exports = ARSystem = (scene, cam, callback) => {
+module.exports = ARSystem = function(scene, cam, callback){
     const self = this;
 
     // scene
@@ -43,8 +43,6 @@ module.exports = ARSystem = (scene, cam, callback) => {
      */
     let bestGpsAcc = 1000.0;
 
-    awake();
-
     const awake = () => {
         scene.add(nBasSys);
         scene.add(dBasSys);
@@ -55,7 +53,7 @@ module.exports = ARSystem = (scene, cam, callback) => {
 
         // getBasHeading
         const intervalTime = 500;
-        const get = this.setInterval( () => {
+        let   get = setInterval( () => {
             const heading = compass.GetHeading();
 
             if(heading !== null){
@@ -69,6 +67,7 @@ module.exports = ARSystem = (scene, cam, callback) => {
                 clearInterval(get);
             }
         }, intervalTime);
+
     };
 
     const start = async () => {
@@ -137,6 +136,8 @@ module.exports = ARSystem = (scene, cam, callback) => {
      */
     const isNeedUpdatePosiotion = (acc) => acc <= bestGpsAcc;
 
+    awake();
+
     self.UpdateHeading = () => {
         const heading = compass.GetHeading();
         const acc     = compass.GetAccuracy();
@@ -182,4 +183,4 @@ module.exports = ARSystem = (scene, cam, callback) => {
         console.log(`Add lat:${lat}, lng:${lng} -> ${crdConv.Pos2Str(pos)}`);
     };
 
-};
+}

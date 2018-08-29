@@ -26,8 +26,6 @@ const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
 const material = new THREE.MeshNormalMaterial();
 const cube     = new THREE.Mesh(geometry, material);
 
-awake();
-
 const awake = () => {
     console.log('awake');
 
@@ -101,3 +99,5 @@ const singletap = async (e) => {
 const doubleTap = async (e) => {
     console.log('double touched');
 };
+
+awake();

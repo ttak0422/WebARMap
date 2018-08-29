@@ -1,4 +1,4 @@
-module.exports = Compass = () => {
+module.exports = Compass = function(){
     const self = this;
 
     const ua = navigator.userAgent;
@@ -44,5 +44,4 @@ module.exports = Compass = () => {
 
     self.GetAccuracy = () => accuracy;
 
-
-};
+}

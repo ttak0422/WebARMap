@@ -1,4 +1,4 @@
-module.exports = CrdConverter = (crd) => {
+module.exports = CrdConverter = function(crd){
     const self = this;
 
     const EARTH_R = 6378137.0;
@@ -42,4 +42,4 @@ module.exports = CrdConverter = (crd) => {
         return `x: ${pos.x.toFixed(2)}, y: ${pos.y.toFixed(2)}, z:${pos.z.toFixed(2)}`;
     };
 
-};
+}
