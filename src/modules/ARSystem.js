@@ -113,6 +113,8 @@ module.exports = ARSystem = function(scene, cam, callback){
      * 基準となる位置の更新
      */
     async function updatePosition(newLat, newLng){
+        console.log(`更新前 ${crdConv.Pos2Str(dBasSys.position)}`);
+
         const gPos = await crdConv.AsyncLatLng2Poition(newLat, newLng);
         const aPos = cam.position;
         const dPos = {
@@ -126,6 +128,8 @@ module.exports = ARSystem = function(scene, cam, callback){
             dBasSys.position.y + dPos.y,
             dBasSys.position.z + dPos.z
         );
+
+        console.log(`更新後 ${crdConv.Pos2Str(dBasSys.position)}`);
     }
 
     /**
