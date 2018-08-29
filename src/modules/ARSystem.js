@@ -82,15 +82,24 @@ module.exports = ARSystem = function(scene, cam, callback){
         callback();
     }
 
-    /**
-     * 基準となる角度の更新
-     */
-    function updateHeading(newHeading){
-        // オイラー角var??????
-        const basHeading = nBasSys.rotation.y;
-        const diffHeading = basHeading - newHeading;
 
-        nBasSys.rotation.y = diffHeading;
+    const deg2Rad   = (deg) => deg / 180.0 * Math.PI;
+    const rad2Deg   = (rad) => rad * 180.0 / Math.PI;
+    const ToSafeDeg = (deg) => deg < 0 ? deg + 360 : deg;
+
+    /**
+     * 基準となる角度の更新．
+     * @param {Number} compasHeadingDeg
+     */
+    function updateHeading(compasHeadingDeg){
+        console.log(`before: ${nBasSys.rotation.y}`);
+        const nBasSysHeadingDeg = rad2Deg(nBasSys.rotation.y);
+        const deviceHeadingDeg  = rad2Deg(cam.rotation.y) - nBasSysHeadingDeg;
+        const newHeading    = compasHeadingDeg - deviceHeadingDeg;
+        const difHeadingDeg = ToSafeDeg(nBasSysHeadingDeg - newHeading);
+        const difHeadingRad = deg2Rad(difHeadingDeg);
+        nBasSys.rotation.set(0, difHeadingRad, 0);
+        console.log(`after: ${nBasSys.rotation.y}`);
     }
 
     /**
@@ -131,6 +140,7 @@ module.exports = ARSystem = function(scene, cam, callback){
         const acc     = compass.GetAccuracy();
 
         if(isNeedUpdateHeading(acc)){
+            console.log("角度の更新が必要．");
             updateHeading(heading);
             bestCompassAcc = acc;
             console.log("角度の更新．");
