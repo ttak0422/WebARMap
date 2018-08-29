@@ -28,10 +28,10 @@ const cube     = new THREE.Mesh(geometry, material);
 
 awake();
 
-function awake(){
+const awake = () => {
     console.log('awake');
 
-    THREEAR.ARUtils.getARDisplay().then(async function (display) {
+    THREEAR.ARUtils.getARDisplay().then(async (display) => {
         if(display){
             console.log('your device is ready for our app!');
 
@@ -59,18 +59,18 @@ function awake(){
             THREEAR.ARUtils.displayUnsupportedMessage();
         }
     });
-}
+};
 
-function start(){
+const start = () => {
     console.log('start');
 
     arSystem.Add(cube);
     cube.position.set(0, 0, -1);
 
     update();
-}
+};
 
-function update(){
+const update = () => {
     renderer.clearColor();
     arView.render();
     vrDisplay.getFrameData(vrFrameData);
@@ -78,27 +78,26 @@ function update(){
     renderer.clearDepth();
     renderer.render(scene, cam);
     vrDisplay.requestAnimationFrame(update);
-}
+};
 
-function onWindowResized(){
+const onWindowResized = () => {
     cam.aspect = window.innerWidth / window.innerHeight;
     cam.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-}
+};
 
-function onClick(e){
+const onClick = (e) => {
     switch(e.touches.length){
         case 1: singletap(e); break;
         case 2: doubletap(e); break;
     }
-}
+};
 
-async function singletap(e){
+const singletap = async (e) => {
     console.log('single touched');
     arSystem.UpdatePosition();
-}
+};
 
-async function doubletap(e){
+const doubleTap = async (e) => {
     console.log('double touched');
-
-}
+};
