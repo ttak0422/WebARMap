@@ -1,4 +1,4 @@
-module.exports = CrdConverter = function(crd){
+module.exports = CrdConverter = (crd) => {
     const self = this;
 
     const EARTH_R = 6378137.0;
@@ -14,20 +14,20 @@ module.exports = CrdConverter = function(crd){
      */
     let basPoint = null;
 
-    async function asyncDeg2Rad(deg){
+    const asyncDeg2Rad = async (deg) => {
         return deg / 180.0 * Math.PI;
-    }
+    };
 
-    async function asyncLatLng2Merc(latDeg, lngDeg){
+    const asyncLatLng2Merc = async (latDeg, lngDeg) => {
         const latRad = await asyncDeg2Rad(latDeg);
         const lngRad = await asyncDeg2Rad(lngDeg);
         return ({
             x : EARTH_R * lngRad,
             y : EARTH_R * latRad
         });
-    }
+    };
 
-    self.AsyncLatLng2Poition = async function(latDeg, lngDeg){
+    self.AsyncLatLng2Poition = async (latDeg, lngDeg) => {
         const objPoint = await asyncLatLng2Merc(latDeg, lngDeg);
         // TODO: ダサくない書き方
         if(basPoint === null) basPoint = await asyncLatLng2Merc(basCrd.latitude, basCrd.longitude);
@@ -36,10 +36,10 @@ module.exports = CrdConverter = function(crd){
             y : 0, // 高さは適当
             z : (objPoint.y - basPoint.y) * (-1)
         });
-    }
+    };
 
-    self.Pos2Str = function(pos){
+    self.Pos2Str = (pos) => {
         return `x: ${pos.x.toFixed(2)}, y: ${pos.y.toFixed(2)}, z:${pos.z.toFixed(2)}`;
-    }
+    };
 
-}
+};
