@@ -1,4 +1,4 @@
-module.exports = Gps = function(){
+module.exports = Gps = () => {
     const self = this;
 
     /**
@@ -29,35 +29,32 @@ module.exports = Gps = function(){
     /**
      * 現在の位置を取得して，それを返す．
      */
-    self.AsyncGetLatLng = function(){
+    self.AsyncGetLatLng = () => {
         return new Promise((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(
-                function(pos){
+                (pos) => {
                     crd = pos.coords;
                     resolve(crd);
                 },
-                function(err){ reject(errorMessage[err.code]); },
+                (err) => { reject(errorMessage[err.code]); },
                 gpsOption
             );
         });
-    }
+    };
 
     /**
      * 最新の位置情報を返す．
      */
-    self.GetCrd = function(){
-        return crd;
-    }
+    self.GetCrd = () => crd;
 
-    self.StartWatchiLatLng = function(){
+    self.StartWatchiLatLng = () => {
         watchId = navigator.geolocation.watchPosition(
-            function(pos){ crd = pos.coords; },
-            function(err){ /* 無視 */ },
+            (pos) => { crd = pos.coords; },
+            (err) => { /* 無視 */ },
             gpsOption
         );
-    }
+    };
 
-    self.StopWatchiLatLng = function(){
-        geolocation.clearWatchi(watchId);
-    }
-}
+    self.StopWatchiLatLng = () => geolocation.clearWatchi(watchId);
+
+};
