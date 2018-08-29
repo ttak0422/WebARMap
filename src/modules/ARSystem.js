@@ -2,7 +2,7 @@
  * ARControlsは初期データの取得に，不定時間かかる．
  * オブジェクトの配置などはcallback関数以後に実行する．
  */
-module.exports = ARSystem = function(scene, cam, callback){
+module.exports = ARSystem = (scene, cam, callback) => {
     const self = this;
 
     // scene
@@ -45,7 +45,7 @@ module.exports = ARSystem = function(scene, cam, callback){
 
     awake();
 
-    function awake(){
+    const awake = () => {
         scene.add(nBasSys);
         scene.add(dBasSys);
         dBasSys.add(cam);
@@ -55,7 +55,7 @@ module.exports = ARSystem = function(scene, cam, callback){
 
         // getBasHeading
         const intervalTime = 500;
-        const get = this.setInterval(function(){
+        const get = this.setInterval( () => {
             const heading = compass.GetHeading();
 
             if(heading !== null){
@@ -69,9 +69,9 @@ module.exports = ARSystem = function(scene, cam, callback){
                 clearInterval(get);
             }
         }, intervalTime);
-    }
+    };
 
-    async function start(){
+    const start = async () => {
         const crd = await gps.AsyncGetLatLng();
 
         console.log(`lat:${crd.latitude}, lng:${crd.longitude}, acc:${crd.accuracy}`);
@@ -80,8 +80,7 @@ module.exports = ARSystem = function(scene, cam, callback){
         crdConv = new CrdConverter(crd);
 
         callback();
-    }
-
+    };
 
     const deg2Rad   = (deg) => deg / 180.0 * Math.PI;
     const rad2Deg   = (rad) => rad * 180.0 / Math.PI;
@@ -91,28 +90,29 @@ module.exports = ARSystem = function(scene, cam, callback){
      * 基準となる角度の更新．
      * @param {Number} compasHeadingDeg
      */
-    function updateHeading(compasHeadingDeg){
+    const updateHeading = (compasHeadingDeg) => {
         console.log(`before: ${nBasSys.rotation.y}`);
+
         const nBasSysHeadingDeg = rad2Deg(nBasSys.rotation.y);
         const deviceHeadingDeg  = rad2Deg(cam.rotation.y) - nBasSysHeadingDeg;
         const newHeading    = compasHeadingDeg - deviceHeadingDeg;
         const difHeadingDeg = ToSafeDeg(nBasSysHeadingDeg - newHeading);
         const difHeadingRad = deg2Rad(difHeadingDeg);
         nBasSys.rotation.set(0, difHeadingRad, 0);
+
         console.log(`after: ${nBasSys.rotation.y}`);
-    }
+    };
 
     /**
      * 角度の更新を行うべきか判断
      */
-    function isNeedUpdateHeading(acc){
-        return acc <= bestCompassAcc;
-    }
+    const isNeedUpdateHeading = (acc) => acc <= bestCompassAcc;
+
 
     /**
      * 基準となる位置の更新
      */
-    async function updatePosition(newLat, newLng){
+    const updatePosition = async (newLat, newLng) => {
         console.log(`更新前 ${crdConv.Pos2Str(dBasSys.position)}`);
 
         const gPos = await crdConv.AsyncLatLng2Poition(newLat, newLng);
@@ -130,16 +130,14 @@ module.exports = ARSystem = function(scene, cam, callback){
         );
 
         console.log(`更新後 ${crdConv.Pos2Str(dBasSys.position)}`);
-    }
+    };
 
     /**
      * 基準となる位置の更新を行うべきか判断
      */
-    function isNeedUpdatePosiotion(acc){
-        return acc <= bestGpsAcc;
-    }
+    const isNeedUpdatePosiotion = (acc) => acc <= bestGpsAcc;
 
-    self.UpdateHeading = function(){
+    self.UpdateHeading = () => {
         const heading = compass.GetHeading();
         const acc     = compass.GetAccuracy();
 
@@ -151,9 +149,9 @@ module.exports = ARSystem = function(scene, cam, callback){
         }else{
             console.log("角度の更新は不要．");
         }
-    }
+    };
 
-    self.UpdatePosition = function(){
+    self.UpdatePosition = () => {
         const crd = gps.GetCrd();
         const acc = crd.accuracy;
         if(isNeedUpdatePosiotion(acc)){
@@ -163,25 +161,25 @@ module.exports = ARSystem = function(scene, cam, callback){
         }else{
             console.log("位置の更新は不要．");
         }
-    }
+    };
 
-    self.Update = function(){
+    self.Update = () => {
         vrControls.update();
-    }
+    };
 
-    self.Add = function(obj){
+    self.Add = (obj) => {
         nBasSys.add(obj);
 
         console.log("Add");
-    }
+    };
 
-    self.Add2LatLng = async function(obj, lat, lng){
+    self.Add2LatLng = async (obj, lat, lng) => {
         const pos = await crdConv.AsyncLatLng2Poition(lat, lng);
 
         nBasSys.add(obj);
         obj.position = pos;
 
         console.log(`Add lat:${lat}, lng:${lng} -> ${crdConv.Pos2Str(pos)}`);
-    }
+    };
 
-}
+};
