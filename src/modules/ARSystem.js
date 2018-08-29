@@ -107,7 +107,6 @@ module.exports = ARSystem = function(scene, cam, callback){
      */
     const isNeedUpdateHeading = (acc) => acc <= bestCompassAcc;
 
-
     /**
      * 基準となる位置の更新
      */
