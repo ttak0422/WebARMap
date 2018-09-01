@@ -14,9 +14,7 @@ module.exports = CrdConverter = function(crd){
      */
     let basPoint = null;
 
-    const asyncDeg2Rad = async (deg) => {
-        return deg / 180.0 * Math.PI;
-    };
+    const asyncDeg2Rad = async (deg) => deg / 180.0 * Math.PI;
 
     const asyncLatLng2Merc = async (latDeg, lngDeg) => {
         const latRad = await asyncDeg2Rad(latDeg);
@@ -38,8 +36,6 @@ module.exports = CrdConverter = function(crd){
         });
     };
 
-    self.Pos2Str = (pos) => {
-        return `x: ${pos.x.toFixed(2)}, y: ${pos.y.toFixed(2)}, z:${pos.z.toFixed(2)}`;
-    };
+    self.Pos2Str = (pos) => `x: ${pos.x.toFixed(2)}, y: ${pos.y.toFixed(2)}, z:${pos.z.toFixed(2)}`;
 
 }
