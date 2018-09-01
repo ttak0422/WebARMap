@@ -103,7 +103,7 @@ module.exports = ARSystem = function(scene, cam, callback){
         console.log(`before: ${nBasSys.rotation.y}`);
 
         const deviceHeadingDeg = rad2Deg(getWorldRotation(cam).y);
-        const compasHeadingDeg = rawCompasHeadingDeg - deviceHeadingDeg;
+        const compasHeadingDeg = ToSafeDeg(rawCompasHeadingDeg - deviceHeadingDeg);
         nBasSys.rotation.set(new Vector3(0, compasHeadingDeg, 0));
 
         console.log(`after: ${getWorldRotation(nBasSys.rotation).y}`);
