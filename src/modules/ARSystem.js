@@ -7,7 +7,7 @@ module.exports = ARSystem = function(scene, cam, callback){
 
     // scene
     //     L nBasSys     (拡張世界と現実世界の角度の差異を吸収)
-    //        L objectA  (現実世界の位置を基準に配置するオブジェクト)
+    //         L objectA  (現実世界の位置を基準に配置するオブジェクト)
     //          ...
     //     L dBasSys     (拡張世界と現実世界の位置の差異を吸収)
     //         L cam     (端末自身)
@@ -83,29 +83,36 @@ module.exports = ARSystem = function(scene, cam, callback){
 
     const deg2Rad   = (deg) => deg / 180.0 * Math.PI;
     const rad2Deg   = (rad) => rad * 180.0 / Math.PI;
-    const ToSafeDeg = (deg) => deg < 0 ? deg + 360 : deg;
+    const ToSafeDeg = (deg) => deg < 0 ? deg + 360 : deg > 360 ? deg % 360 : deg;
+    const getWorldRotation = (obj) => {
+        const addRotation = (rot1, rot2) =>
+            new THREE.Vector3(rot1.x + rot2.x, rot1.y + rot2.y, rot1.z + rot2.z);
+        return (obj === null) ? new THREE.Vector3()
+            : addRotation(obj.rotation, getWorldRotation(obj.parent));
+    };
 
     /**
      * 基準となる角度の更新．
-     * @param {Number} compasHeadingDeg
+     * @param {Number} rawCompasHeadingDeg
      */
-    const updateHeading = (compasHeadingDeg) => {
+    const updateHeading = (rawCompasHeadingDeg) => {
+
+        // nBasSys
+        //     L cam (コンパスが取得するのは)
+
         console.log(`before: ${nBasSys.rotation.y}`);
 
-        const nBasSysHeadingDeg = rad2Deg(nBasSys.rotation.y);
-        const deviceHeadingDeg  = rad2Deg(cam.rotation.y) - nBasSysHeadingDeg;
-        const newHeading    = compasHeadingDeg - deviceHeadingDeg;
-        const difHeadingDeg = ToSafeDeg(nBasSysHeadingDeg - newHeading);
-        const difHeadingRad = deg2Rad(difHeadingDeg);
-        nBasSys.rotation.set(0, difHeadingRad, 0);
+        const deviceHeadingDeg = rad2Deg(getWorldRotation(cam).y);
+        const compasHeadingDeg = rawCompasHeadingDeg - deviceHeadingDeg;
+        nBasSys.rotation.set(new Vector3(0, compasHeadingDeg, 0));
 
-        console.log(`after: ${nBasSys.rotation.y}`);
+        console.log(`after: ${getWorldRotation(nBasSys.rotation).y}`);
     };
 
     /**
      * 角度の更新を行うべきか判断
      */
-    const isNeedUpdateHeading = (acc) => acc <= bestCompassAcc;
+    const isNeedUpdateHeading = (acc) => acc <= bestCompassAcc
 
     /**
      * 基準となる位置の更新
