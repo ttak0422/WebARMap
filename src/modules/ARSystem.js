@@ -144,6 +144,11 @@ module.exports = ARSystem = function(scene, cam, callback){
 
     awake();
 
+    /**
+     * 基準となる角度の再計算を行う．
+     * アプリの利用範囲内でのコンパスの測定結果は
+     * 精度を無視して一定になるものと仮定する．
+     */
     self.UpdateHeading = () => {
         const heading = compass.GetHeading();
         const acc     = compass.GetAccuracy();
@@ -158,6 +163,11 @@ module.exports = ARSystem = function(scene, cam, callback){
         }
     };
 
+    /**
+     * 基準となる位置の再計算を行う．
+     * 長距離の移動に向かないarkitによる移動結果を
+     * GPSによって補足された位置に移動させることで補正させる．
+     */
     self.UpdatePosition = () => {
         const crd = gps.GetCrd();
         const acc = crd.accuracy;
