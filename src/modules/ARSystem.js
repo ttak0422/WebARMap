@@ -5,8 +5,18 @@
 module.exports = ARSystem = function(scene, cam, callback){
     const self = this;
 
+    // *** Debug ***
+    const cubeSize = 0.3;
+    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+    const material = new THREE.MeshNormalMaterial();
+    const cube     = new THREE.Mesh(geometry, material);
+
     const dataRef    = firebase.database().ref('data');
     const storageRef = firebase.storage().ref();
+
+    // TODO: firebase関連をモジュール化
+    // const dataRef    = firebase.database().ref('data');
+    // const storageRef = firebase.storage().ref();
 
     // scene
     //     L nBasSys     (拡張世界と現実世界の角度の差異を吸収)
@@ -45,44 +55,6 @@ module.exports = ARSystem = function(scene, cam, callback){
      * gpsの精度のベスト．<m>
      */
     let bestGpsAcc = 1000.0;
-
-    const awake = () => {
-        scene.add(nBasSys);
-        scene.add(dBasSys);
-        dBasSys.add(cam);
-
-        compass.StartWatchiHeading();
-        gps.StartWatchiLatLng();
-
-        // getBasHeading
-        const intervalTime = 500;
-        let   get = setInterval( () => {
-            const heading = compass.GetHeading();
-
-            if(heading !== null){
-                console.log(`getBasHeading:${heading}`);
-
-                bestCompassAcc = compass.GetAccuracy();
-                nBasSys.rotation.y = heading;
-
-                start();
-
-                clearInterval(get);
-            }
-        }, intervalTime);
-
-    };
-
-    const start = async () => {
-        const crd = await gps.AsyncGetLatLng();
-
-        console.log(`lat:${crd.latitude}, lng:${crd.longitude}, acc:${crd.accuracy}`);
-
-        bestGpsAcc = crd.accuracy;
-        crdConv = new CrdConverter(crd);
-
-        callback();
-    };
 
     const deg2Rad   = (deg) => deg / 180.0 * Math.PI;
     const rad2Deg   = (rad) => rad * 180.0 / Math.PI;
@@ -208,22 +180,67 @@ module.exports = ARSystem = function(scene, cam, callback){
         scene.add(sprite);
     }
 
+    const awake = () => {
+        scene.add(nBasSys);
+        scene.add(dBasSys);
+        dBasSys.add(cam);
+
+        compass.StartWatchiHeading();
+        gps.StartWatchiLatLng();
+
+        // getBasHeading
+        const intervalTime = 500;
+        let   get = setInterval( () => {
+            const heading = compass.GetHeading();
+
+            if(heading !== null){
+                console.log(`getBasHeading:${heading}`);
+
+                bestCompassAcc = compass.GetAccuracy();
+                nBasSys.rotation.y = heading;
+
+                start();
+
+                clearInterval(get);
+            }
+        }, intervalTime);
+
+    };
+
+    const start = async () => {
+        const crd = await gps.AsyncGetLatLng();
+
+        console.log(`lat:${crd.latitude}, lng:${crd.longitude}, acc:${crd.accuracy}`);
+
+        bestGpsAcc = crd.accuracy;
+        crdConv = new CrdConverter(crd);
+
+        // firebase
+        dataRef.on('child_added', async (snapshot) => {
+            const data = snapshot.val();
+            const lat = data.lat;
+            const lng = data.lng;
+            const pos = await crdConv.AsyncLatLng2Poition(lat, lng);
+
+            self.Add2LatLng(cube, lat, lng);
+
+            switch(data.value){
+                case "text":
+                    // TODO: add2latlngに切り替え
+                    createText2D(data.value,
+                        {x:pos.x, y:0, z:pos.z, textSize:50},
+                        scene);
+                    break;
+            }
+            console.log(JSON.stringify(data, null , "\t"));
+        });
+
+        callback();
+    };
+
     awake();
 
-    dataRef.on('child_added', async (snapshot) => {
-        const data = snapshot.val();
-        const lat = data.lat;
-        const lng = data.lng;
-        const pos = await crdConv.AsyncLatLng2Poition(lat, lng);
 
-        switch(data.value){
-            case "text":
-                createText2D(data.value,
-                    {x:pos.x, y:0, z:pos.z, textSize:50},
-                    scene);
-                break;
-        }
-    });
 
     /**
      * 基準となる角度の再計算を行う．
