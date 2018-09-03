@@ -1,6 +1,8 @@
 const msg = 'ようこそARの世界へ';
 
 import 'three/VRControls';
+import CSS3DRenderer from 'three/examples/js/renderers/CSS3DRenderer'
+import PlaneGeometry from 'three/src/geometries/PlaneGeometry'
 import Gps from './modules/Gps';
 import Compass from './modules/Compass';
 import CrdConverter from './modules/CrdConverter';
