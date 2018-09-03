@@ -126,16 +126,23 @@ module.exports = ARSystem = function(scene, cam, callback){
         const bgColor   = params.bgColor   || '#000000';
         const bgMargine = params.bgMargine || 15;
 
+        console.log(`x:${x} y:${y} z:${z} textSize:${textSize} textColor:${textColor} bgColor:${bgColor} bgMargine:${bgMargine}`);
+
         // キャンバスの作成
         const canvas     = document.createElement('canvas');
         const context    = canvas.getContext('2d');
-        const lines      = text.splt("\n");
+        const lines      = text.split("\n");
         const lineHeight = 1.1618; // 経験と実績から...
         const lineWidth  = Math.max(lines.map(x => context.measureText(x).width));
+
+        console.log(`canvas:${canvas} context:${context} line:${lines} lineHeight:${lineHeight} lineWidth:${lineWidth}`);
         context.font = textSize + "px Arial";
 
         const canvasWidth  = lineWidth + bgMargine * 2;
-        const canvasHeight = textSize * lines.lines * lineHeight + bgMargine * 2;
+        const canvasHeight = textSize * lines.length * lineHeight + bgMargine * 2;
+
+        console.log(`canvasWidth:${canvasWidth} canvasHeight:${canvasHeight}`);
+
         canvas.width        = canvasWidth;
         canvas.height       = canvasHeight;
         context.globalAlpha = 0.5;
@@ -171,13 +178,20 @@ module.exports = ARSystem = function(scene, cam, callback){
 
         // リサイズの大きさを求める
         const spriteWidth  = canvas.width / 10 // ?
-        const spriteHeight = texture.image.height / (texture.image.width / w);
+        const spriteHeight = texture.image.height / (texture.image.width / spriteWidth);
         const material     = new THREE.SpriteMaterial({map: texture});
         const sprite       = new THREE.Sprite(material);
-        sprite.position.set(x, y, z);
         sprite.scale.x = spriteWidth;
         sprite.scale.y = spriteHeight;
-        scene.add(sprite);
+        sprite.position.set(x, y, z);
+        //scene.add(sprite);
+        nBasSys.add(sprite);
+        // self.Add2LatLng(cube, lat, lng);
+        cube.position.set(x,y,z);
+        nBasSys.add(cube);
+        console.log("add 3d text");
+        console.log(`@sprite pos: ${crdConv.Pos2Str(sprite.getWorldPosition())}`);
+        console.log(`@cube pos: ${crdConv.Pos2Str(cube.getWorldPosition())}`);
     }
 
     const awake = () => {
@@ -222,14 +236,15 @@ module.exports = ARSystem = function(scene, cam, callback){
             const lng = data.lng;
             const pos = await crdConv.AsyncLatLng2Poition(lat, lng);
 
-            self.Add2LatLng(cube, lat, lng);
+            // self.Add2LatLng(cube, lat, lng);
 
-            switch(data.value){
+            switch(data.valueType){
                 case "text":
                     // TODO: add2latlngに切り替え
                     createText2D(data.value,
-                        {x:pos.x, y:0, z:pos.z, textSize:50},
+                        {x:pos.x, y:0, z:pos.z, textSize:5},
                         scene);
+                    console.log("call");
                     break;
             }
             console.log(JSON.stringify(data, null , "\t"));
