@@ -5,6 +5,9 @@
 module.exports = ARSystem = function(scene, cam, callback){
     const self = this;
 
+    const dataRef    = firebase.database().ref('data');
+    const storageRef = firebase.storage().ref();
+
     // scene
     //     L nBasSys     (拡張世界と現実世界の角度の差異を吸収)
     //         L objectA  (現実世界の位置を基準に配置するオブジェクト)
@@ -142,7 +145,85 @@ module.exports = ARSystem = function(scene, cam, callback){
      */
     const isNeedUpdatePosiotion = (acc) => acc <= bestGpsAcc;
 
+    const createText2D = (text, params, scene) => {
+        const x = params.x || 0;
+        const y = params.y || 0;
+        const z = params.z || 0;
+        const textSize  = params.textSize  || 2;
+        const textColor = params.textColor || '#ffffff';
+        const bgColor   = params.bgColor   || '#000000';
+        const bgMargine = params.bgMargine || 15;
+
+        // キャンバスの作成
+        const canvas     = document.createElement('canvas');
+        const context    = canvas.getContext('2d');
+        const lines      = text.splt("\n");
+        const lineHeight = 1.1618; // 経験と実績から...
+        const lineWidth  = Math.max(lines.map(x => context.measureText(x).width));
+        context.font = textSize + "px Arial";
+
+        const canvasWidth  = lineWidth + bgMargine * 2;
+        const canvasHeight = textSize * lines.lines * lineHeight + bgMargine * 2;
+        canvas.width        = canvasWidth;
+        canvas.height       = canvasHeight;
+        context.globalAlpha = 0.5;
+        context.fillStyle   = bgColor;
+        context.fillRect(0, 0, canvasWidth, canvasHeight);
+        console.log(`contextRect x:${0} y:${0} w:${canvasWidth} h:${canvasHeight}`);
+
+        // 文字の描写開始
+        context.beginPath();
+        // フォントサイズとスタイルの定義
+        context.font = textSize + "px Arial";
+        // 文字の表示位置の指定
+        context.textAlign    = "left";
+        context.textBaseline = "middle";
+        // 文字の色
+        context.fillStyle   = textColor;
+        // 文字の透明度
+        context.globalAlpha = 1;
+
+        // 1行ずつ描画
+        for(let i = 0; i < lines.length; i++){
+            const line = lines[i];
+            const addY = textSize / 2 + textSize * lineHeight * i;
+            context.fillText(line, bgMargine, addY + bgMargine);
+            context.fill();
+        }
+        console.log(`canvasSize w:${canvas.width} h:${canvas.height}`);
+
+        // テクスチャの作成
+        const texture = new THREE.Texture(canvas);
+        texture.needsUpdate = true;
+        texture.minFilter   = THREE.LinearFilter;
+
+        // リサイズの大きさを求める
+        const spriteWidth  = canvas.width / 10 // ?
+        const spriteHeight = texture.image.height / (texture.image.width / w);
+        const material     = new THREE.SpriteMaterial({map: texture});
+        const sprite       = new THREE.Sprite(material);
+        sprite.position.set(x, y, z);
+        sprite.scale.x = spriteWidth;
+        sprite.scale.y = spriteHeight;
+        scene.add(sprite);
+    }
+
     awake();
+
+    dataRef.on('child_added', async (snapshot) => {
+        const data = snapshot.val();
+        const lat = data.lat;
+        const lng = data.lng;
+        const pos = await crdConv.AsyncLatLng2Poition(lat, lng);
+
+        switch(data.value){
+            case "text":
+                createText2D(data.value,
+                    {x:pos.x, y:0, z:pos.z, textSize:50},
+                    scene);
+                break;
+        }
+    });
 
     /**
      * 基準となる角度の再計算を行う．
