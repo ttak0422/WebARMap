@@ -3,11 +3,22 @@ const msg = 'ようこそARの世界へ';
 import 'three/VRControls';
 import CSS3DRenderer from 'three/examples/js/renderers/CSS3DRenderer'
 import PlaneGeometry from 'three/src/geometries/PlaneGeometry'
+import firebase      from "firebase"
 import Gps from './modules/Gps';
 import Compass from './modules/Compass';
 import CrdConverter from './modules/CrdConverter';
 
 import ARSystem from './modules/ARSystem';
+// *** firebase ***
+const fbConfig = {
+    apiKey:            "AIzaSyDw4-3Akzm1cOnUmax1xSt-hhG0Hfk23UA",
+    authDomain:        "traindelayinfo-59c58.firebaseapp.com",
+    databaseURL:       "https://traindelayinfo-59c58.firebaseio.com",
+    projectId:         "traindelayinfo-59c58",
+    storageBucket:     "traindelayinfo-59c58.appspot.com",
+    messagingSenderId: "733403021850"
+};
+firebase.initializeApp(fbConfig);
 
 // *** THREE ***
 const renderer = new THREE.WebGLRenderer({alpha: true});
