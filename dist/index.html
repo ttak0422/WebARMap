@@ -19,6 +19,24 @@
         </style>
     </head>
     <body>
+        <!-- firebase console > "ウェブアプリに Firebase を追加"で表示されるコードを追加 -->
+        <!-- Firebase App is always required and must be first -->
+        <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-app.js"></script>
+        <!-- Add additional services you want to use -->
+        <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-database.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-storage.js"></script>
+        <script>
+            // *** firebase ***
+            const fbConfig = {
+                apiKey:            "AIzaSyDw4-3Akzm1cOnUmax1xSt-hhG0Hfk23UA",
+                authDomain:        "traindelayinfo-59c58.firebaseapp.com",
+                databaseURL:       "https://traindelayinfo-59c58.firebaseio.com",
+                projectId:         "traindelayinfo-59c58",
+                storageBucket:     "traindelayinfo-59c58.appspot.com",
+                messagingSenderId: "733403021850"
+            };
+            firebase.initializeApp(fbConfig);
+        </script>
         <script src="./bundle.js"></script>
     </body>
 </html>
