@@ -62,7 +62,7 @@ module.exports = ARSystem = function(scene, cam, callback){
     const getWorldRotation = (obj) => {
         const addRotation = (rot1, rot2) =>
             new THREE.Vector3(rot1.x + rot2.x, rot1.y + rot2.y, rot1.z + rot2.z);
-        return (obj === null) ? new THREE.Vector3()
+        return (obj === null || obj === undefined) ? new THREE.Vector3()
             : addRotation(obj.rotation, getWorldRotation(obj.parent));
     };
 
@@ -79,7 +79,7 @@ module.exports = ARSystem = function(scene, cam, callback){
 
         const deviceHeadingDeg = rad2Deg(getWorldRotation(cam).y);
         const compasHeadingDeg = ToSafeDeg(rawCompasHeadingDeg - deviceHeadingDeg);
-        nBasSys.rotation.set(new Vector3(0, compasHeadingDeg, 0));
+        nBasSys.rotation.set(new THREE.Vector3(0, compasHeadingDeg, 0));
 
         console.log(`after: ${getWorldRotation(nBasSys.rotation).y}`);
     };
@@ -222,7 +222,7 @@ module.exports = ARSystem = function(scene, cam, callback){
     };
 
     const start = async () => {
-        const crd = await gps.AsyncGetLatLng();
+        const crd = await gps.AsyncGetLatLng().catch(msg => alert(msg));
 
         console.log(`lat:${crd.latitude}, lng:${crd.longitude}, acc:${crd.accuracy}`);
 
@@ -254,8 +254,6 @@ module.exports = ARSystem = function(scene, cam, callback){
     };
 
     awake();
-
-
 
     /**
      * 基準となる角度の再計算を行う．
