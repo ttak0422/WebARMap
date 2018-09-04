@@ -119,14 +119,21 @@ module.exports = ARSystem = function(scene, cam, callback){
 
     const createText2D = (text, params) => {
         // TODO: フォントサイズとARとのサイズの対応関係について調査
+        // TODO: ほしいテキストの大きさは物理的な距離によっても変化する．
+
+        // unityと同様に文字がにじむので，強大なcanvasを作成．その後
+        // それを縮小したspriteを生成する
+
+        // 座標による計算のみを行っているので基本的にy座標は0になる．相対的に見て高い位置にある方が見やすい．
+        const addHeight = 1.5;
         const x = params.x || 0;
-        const y = params.y || 0;
+        const y = (params.y || 0) + addHeight;
         const z = params.z || 0;
-        const scale = params.scale || 2;
-        const textSize  = params.textSize  || 2;
+        const scale     = params.scale     || 2;
+        const textSize  = params.textSize  || 50;
+        const bgMargine = params.bgMargine || 15;
         const textColor = params.textColor || '#ffffff';
         const bgColor   = params.bgColor   || '#000000';
-        const bgMargine = params.bgMargine || 1.5;
 
         console.log(`x:${x} y:${y} z:${z} textSize:${textSize} textColor:${textColor} bgColor:${bgColor} bgMargine:${bgMargine}`);
 
@@ -136,11 +143,12 @@ module.exports = ARSystem = function(scene, cam, callback){
         const lines      = text.split("\n");
         const lineHeight = 1.1618; // 経験と実績から...
         const lineWidth  = Math.max(lines.map(x => context.measureText(x).width));
+        const charInLine = Math.max(lines.map(x => x.length));
 
         console.log(`canvas:${canvas} context:${context} line:${lines} lineHeight:${lineHeight} lineWidth:${lineWidth}`);
         context.font = textSize + "px Arial";
 
-        const canvasWidth  = lineWidth + bgMargine * 2;
+        const canvasWidth  = lineWidth * charInLine + bgMargine * 2;
         const canvasHeight = textSize * lines.length * lineHeight + bgMargine * 2;
 
         console.log(`canvasWidth:${canvasWidth} canvasHeight:${canvasHeight}`);
@@ -179,13 +187,13 @@ module.exports = ARSystem = function(scene, cam, callback){
         texture.minFilter   = THREE.LinearFilter;
 
         // リサイズの大きさを求める
-        const spriteWidth  = canvas.width / 100 * scale;
-        const spriteHeight = texture.image.height / (texture.image.width / spriteWidth);
+        const spriteWidth  = canvas.width  / 100 * scale;
+        const spriteHeight = canvas.height / 100 * scale;
         const material     = new THREE.SpriteMaterial({map: texture});
         const sprite       = new THREE.Sprite(material);
         sprite.scale.x = spriteWidth;
         sprite.scale.y = spriteHeight;
-        // sprite.position.set(x, y, z);
+        sprite.position.set(x, y, z);
         // scene.add(sprite);
         nBasSys.add(sprite);
         // self.Add2LatLng(cube, lat, lng);
