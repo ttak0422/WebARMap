@@ -96,7 +96,8 @@ const onClick = (e) => {
 
 const singletap = async (e) => {
     console.log('single touched');
-    arSystem.UpdateHeading();
+    //arSystem.UpdateHeading();
+    arSystem.UpdatePosition();
 };
 
 const doubleTap = async (e) => {
