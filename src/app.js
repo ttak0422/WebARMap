@@ -12,10 +12,12 @@ import ARSystem from './modules/ARSystem';
 
 // *** THREE ***
 const renderer = new THREE.WebGLRenderer({alpha: true});
-const canvas   = renderer.domElement;
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.autoClear = false;
+renderer.domElement.style.position = 'absolute';
+renderer.domElement.style.top = '5%';
+const canvas   = renderer.domElement;
 document.body.appendChild(canvas);
 const scene   = new THREE.Scene();
 const ambient = new THREE.AmbientLight(0xffffff, 0.7);
