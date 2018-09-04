@@ -17,8 +17,27 @@
                 user-select: none;
             }
         </style>
+        <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
+        <div class="tabs">
+            <input id="main" type="radio" name="tab_item" >
+            <label class="tab_item" for="main">メイン</label>
+
+            <input id="map" type="radio" name="tab_item" checked>
+            <label class="tab_item" for="map">マップ</label>
+
+            <!-- ページ1 -->
+            <div class="tab_content" id="main_content">
+                <div class="tab_content_description" id="threeJSElement"></div>
+            </div>
+
+            <!-- ページ2 -->
+            <div class="tab_content" id="map_content">
+                <div class="tab_content_description" id="mapfit"></div>
+            </div>
+        </div>
+
         <!-- firebase console > "ウェブアプリに Firebase を追加"で表示されるコードを追加 -->
         <!-- Firebase App is always required and must be first -->
         <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-app.js"></script>
@@ -37,6 +56,15 @@
             };
             firebase.initializeApp(fbConfig);
         </script>
+
+        <!-- ページ1 -->
         <script src="./bundle.js"></script>
+
+        <!-- ページ2 -->
+        <link href="https://cdn.mapfit.com/v2-4/assets/css/mapfit.css" rel="stylesheet" />
+        <script src="https://cdn.mapfit.com/v2-4/assets/js/tetragon.js"></script>
+        <script src="https://cdn.mapfit.com/v2-4/assets/js/mapfit.js"></script>
+        <script src="./map.js"></script>
+
     </body>
 </html>
