@@ -12,10 +12,11 @@ import ARSystem from './modules/ARSystem';
 
 // *** THREE ***
 const renderer = new THREE.WebGLRenderer({alpha: true});
+const canvas   = renderer.domElement;
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.autoClear = false;
-document.body.appendChild(renderer.domElement);
+document.body.appendChild(canvas);
 const scene   = new THREE.Scene();
 const ambient = new THREE.AmbientLight(0xffffff, 0.7);
 scene.add(ambient);
@@ -52,7 +53,7 @@ const awake = () => {
             );
 
             window.addEventListener('resize', onWindowResized, false);
-            window.addEventListener('touchstart', onClick, false);
+            canvas.addEventListener('touchstart', onClick, false);
 
             arSystem = new ARSystem(scene, cam, start);
         }else{
