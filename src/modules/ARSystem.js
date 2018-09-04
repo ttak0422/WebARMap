@@ -143,12 +143,12 @@ module.exports = ARSystem = function(scene, cam, callback){
         const lines      = text.split("\n");
         const lineHeight = 1.1618; // 経験と実績から...
         const lineWidth  = Math.max.apply(null, lines.map(x => context.measureText(x).width));
-        // const charInLine = Math.max.apply(null, lines.map(x => x.length));
+        const charInLine = Math.max.apply(null, lines.map(x => x.length));
 
         console.log(`canvas:${canvas} context:${context} line:${lines} lineHeight:${lineHeight} lineWidth:${lineWidth}`);
         context.font = textSize + "px Arial";
 
-        const canvasWidth  = lineWidth + bgMargine * 2;
+        const canvasWidth  = charInLine * textSize + bgMargine * 2;
         const canvasHeight = textSize * lines.length * lineHeight + bgMargine * 2;
 
         console.log(`canvasWidth:${canvasWidth} canvasHeight:${canvasHeight}`);
