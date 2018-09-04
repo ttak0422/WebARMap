@@ -117,14 +117,16 @@ module.exports = ARSystem = function(scene, cam, callback){
      */
     const isNeedUpdatePosiotion = (acc) => acc <= bestGpsAcc;
 
-    const createText2D = (text, params, scene) => {
+    const createText2D = (text, params) => {
+        // TODO: フォントサイズとARとのサイズの対応関係について調査
         const x = params.x || 0;
         const y = params.y || 0;
         const z = params.z || 0;
+        const scale = params.scale || 2;
         const textSize  = params.textSize  || 2;
         const textColor = params.textColor || '#ffffff';
         const bgColor   = params.bgColor   || '#000000';
-        const bgMargine = params.bgMargine || 15;
+        const bgMargine = params.bgMargine || 1.5;
 
         console.log(`x:${x} y:${y} z:${z} textSize:${textSize} textColor:${textColor} bgColor:${bgColor} bgMargine:${bgMargine}`);
 
@@ -177,18 +179,16 @@ module.exports = ARSystem = function(scene, cam, callback){
         texture.minFilter   = THREE.LinearFilter;
 
         // リサイズの大きさを求める
-        const spriteWidth  = canvas.width / 10 // ?
+        const spriteWidth  = canvas.width / 100 * scale;
         const spriteHeight = texture.image.height / (texture.image.width / spriteWidth);
         const material     = new THREE.SpriteMaterial({map: texture});
         const sprite       = new THREE.Sprite(material);
         sprite.scale.x = spriteWidth;
         sprite.scale.y = spriteHeight;
-        sprite.position.set(x, y, z);
-        //scene.add(sprite);
+        // sprite.position.set(x, y, z);
+        // scene.add(sprite);
         nBasSys.add(sprite);
         // self.Add2LatLng(cube, lat, lng);
-        cube.position.set(x,y,z);
-        nBasSys.add(cube);
         console.log("add 3d text");
         console.log(`@sprite pos: ${crdConv.Pos2Str(sprite.getWorldPosition())}`);
         console.log(`@cube pos: ${crdConv.Pos2Str(cube.getWorldPosition())}`);
@@ -242,7 +242,7 @@ module.exports = ARSystem = function(scene, cam, callback){
                 case "text":
                     // TODO: add2latlngに切り替え
                     createText2D(data.value,
-                        {x:pos.x, y:0, z:pos.z, textSize:5},
+                        {x:pos.x, y:0, z:pos.z, scale:1},
                         scene);
                     console.log("call");
                     break;
