@@ -1,4 +1,4 @@
-const msg = 'ようこそARの世界へ';
+const msg = 'ようこそARの世界へ\n端末を静止させて，\nしばらくお待ち下さい';
 
 import 'three/VRControls';
 import CSS3DRenderer from 'three/examples/js/renderers/CSS3DRenderer'
