@@ -97,11 +97,11 @@ const onClick = (e) => {
 const singletap = async (e) => {
     console.log('single touched');
     //arSystem.UpdateHeading();
-    arSystem.UpdatePosition();
 };
 
 const doubleTap = async (e) => {
     console.log('double touched');
+    arSystem.UpdatePosition();
 };
 
 awake();
