@@ -1,0 +1,99 @@
+<html>
+  <head>
+    <meta charset=utf-8>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" type="text/css" href="./style.css">
+    <title>edit</title>
+  </head>
+
+  <body>
+    <div id="scene1" class="scene">
+        <div id="user_info">
+            <span value="user name" id="user_name">user name</span>
+            <button class="button1" id="sign_in_btn">sign in</button>
+            <button class="button1" id="sign_out_btn">sign out</button>
+        </div>
+      
+        <form>
+            <div class="select_form sel">
+              <select name="要素" id="select">
+                <option value="text">text</option>
+                <option value="image">image</option>
+                <option value="movie">movie</option>
+              </select>
+            </div>
+              
+            <div id="dynamic_form_box1">
+                <div id="dynamic_form_box2">
+                    <div>
+                        <textarea id="input_text" placeholder="input text"></textarea>
+                    </div>
+                    <div>
+                        <input type="file" id="input_image" name="datafile" accept="image/*,capture=camera">    
+                    </div>
+                    <div>
+                        <input type="text" id="input_url" placeholder="input url">
+                    </div>
+                </div>
+            </div>
+            
+        </form>
+        
+        <div>
+            <div margin='0px'>
+                <span class="latlng">緯度：</span>
+                <input type="text" id="lat">
+            </div>
+            <div margin='0px'>
+                <span class="latlng">緯度：</span>
+                <input type="text" id="lng">
+            </div>
+        </div>
+
+        <div id="bottom">
+            <form id="buttons"> 
+                <input class="button2" type="button" value="削除" id="delete_btn"></input>
+                <input class="button2" type="button" value="登録" id="registration_btn"></input>
+            </form>
+        </div>
+    </div>
+
+    <div id="scene2" class="scene">
+        <div id="mapfit"></div>
+    </div>
+
+    <!-- firebase console > "ウェブアプリに Firebase を追加"で表示されるコードを追加 -->
+    <!-- Firebase App is always required and must be first -->
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-app.js"></script>
+
+    <!-- Add additional services you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-storage.js"></script>
+
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyDw4-3Akzm1cOnUmax1xSt-hhG0Hfk23UA",
+        authDomain: "traindelayinfo-59c58.firebaseapp.com",
+        databaseURL: "https://traindelayinfo-59c58.firebaseio.com",
+        projectId: "traindelayinfo-59c58",
+        storageBucket: "traindelayinfo-59c58.appspot.com",
+        messagingSenderId: "733403021850"
+    };
+    firebase.initializeApp(config);
+    </script>
+  
+    <link href="https://cdn.mapfit.com/v2-4/assets/css/mapfit.css" rel="stylesheet" />
+    <script src="https://cdn.mapfit.com/v2-4/assets/js/tetragon.js"></script>
+    <script src="https://cdn.mapfit.com/v2-4/assets/js/mapfit.js"></script>
+    <script src="./map.js"></script>
+
+    <script src="./form.js"></script>
+
+    <script src="./firebase.js"></script>
+
+
+  </body>
+
+</html>

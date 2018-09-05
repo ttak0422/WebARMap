@@ -10,6 +10,24 @@ html {
     width: 100%;
     padding: 0;
     margin: 0;
+    z-index: 1;
+  }
+  #edit_btn {
+    position: absolute;
+    top: 6%;
+    right: 10px;
+    padding: 0.25em 0.5em;
+    text-decoration: none;
+    color: #FFF;
+    background: #03A9F4;/*色*/
+    border: solid 1px #0f9ada;/*線色*/
+    border-radius: 4px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+    text-shadow: 0 1px 0 rgba(0,0,0,0.2);
+    text-align:center;
+    margin: 20px;
+    font-size: inherit;
+    z-index: 5;
   }
 
 
