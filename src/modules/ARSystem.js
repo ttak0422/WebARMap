@@ -5,12 +5,6 @@
 module.exports = ARSystem = function(scene, cam, callback){
     const self = this;
 
-    // *** Debug ***
-    const cubeSize = 0.3;
-    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
-    const material = new THREE.MeshNormalMaterial();
-    const cube     = new THREE.Mesh(geometry, material);
-
     const dataRef    = firebase.database().ref('data');
     const storageRef = firebase.storage().ref();
 
@@ -194,12 +188,94 @@ module.exports = ARSystem = function(scene, cam, callback){
         sprite.scale.x = spriteWidth;
         sprite.scale.y = spriteHeight;
         sprite.position.set(x, y, z);
-        // scene.add(sprite);
+
         nBasSys.add(sprite);
-        // self.Add2LatLng(cube, lat, lng);
+
         console.log("add 3d text");
         console.log(`@sprite pos: ${crdConv.Pos2Str(sprite.getWorldPosition())}`);
-        console.log(`@cube pos: ${crdConv.Pos2Str(cube.getWorldPosition())}`);
+    }
+
+    // TODO:
+    const createText2DLocal = (text, params) => {
+        // TODO: フォントサイズとARとのサイズの対応関係について調査
+        // TODO: ほしいテキストの大きさは物理的な距離によっても変化する．
+
+        // unityと同様に文字がにじむので，強大なcanvasを作成．その後
+        // それを縮小したspriteを生成する
+
+        const x = params.x || 0;
+        const y = params.y || 0;
+        const z = params.z || 0;
+        const scale     = params.scale     || 2;
+        const textSize  = params.textSize  || 50;
+        const bgMargine = params.bgMargine || 15;
+        const textColor = params.textColor || '#ffffff';
+        const bgColor   = params.bgColor   || '#000000';
+
+        console.log(`x:${x} y:${y} z:${z} textSize:${textSize} textColor:${textColor} bgColor:${bgColor} bgMargine:${bgMargine}`);
+
+        // キャンバスの作成
+        const canvas     = document.createElement('canvas');
+        const context    = canvas.getContext('2d');
+        const lines      = text.split("\n");
+        const lineHeight = 1.1618; // 経験と実績から...
+        const lineWidth  = Math.max.apply(null, lines.map(x => context.measureText(x).width));
+        const charInLine = Math.max.apply(null, lines.map(x => x.length));
+
+        console.log(`canvas:${canvas} context:${context} line:${lines} lineHeight:${lineHeight} lineWidth:${lineWidth}`);
+        context.font = textSize + "px Arial";
+
+        const canvasWidth  = charInLine * textSize + bgMargine * 2;
+        const canvasHeight = textSize * lines.length * lineHeight + bgMargine * 2;
+
+        console.log(`canvasWidth:${canvasWidth} canvasHeight:${canvasHeight}`);
+
+        canvas.width        = canvasWidth;
+        canvas.height       = canvasHeight;
+        context.globalAlpha = 0.5;
+        context.fillStyle   = bgColor;
+        context.fillRect(0, 0, canvasWidth, canvasHeight);
+        console.log(`contextRect x:${0} y:${0} w:${canvasWidth} h:${canvasHeight}`);
+
+        // 文字の描写開始
+        context.beginPath();
+        // フォントサイズとスタイルの定義
+        context.font = textSize + "px Arial";
+        // 文字の表示位置の指定
+        context.textAlign    = "left";
+        context.textBaseline = "middle";
+        // 文字の色
+        context.fillStyle   = textColor;
+        // 文字の透明度
+        context.globalAlpha = 1;
+
+        // 1行ずつ描画
+        for(let i = 0; i < lines.length; i++){
+            const line = lines[i];
+            const addY = textSize / 2 + textSize * lineHeight * i;
+            context.fillText(line, bgMargine, addY + bgMargine);
+            context.fill();
+        }
+        console.log(`canvasSize w:${canvas.width} h:${canvas.height}`);
+
+        // テクスチャの作成
+        const texture = new THREE.Texture(canvas);
+        texture.needsUpdate = true;
+        texture.minFilter   = THREE.LinearFilter;
+
+        // リサイズの大きさを求める
+        const spriteWidth  = canvas.width  / 100 * scale;
+        const spriteHeight = canvas.height / 100 * scale;
+        const material     = new THREE.SpriteMaterial({map: texture});
+        const sprite       = new THREE.Sprite(material);
+        sprite.scale.x = spriteWidth;
+        sprite.scale.y = spriteHeight;
+        sprite.position.set(x, y, z);
+
+        scene.add(sprite);
+
+        console.log("add 3d text");
+        console.log(`@sprite pos: ${crdConv.Pos2Str(sprite.getWorldPosition())}`);
     }
 
     const awake = () => {
@@ -244,8 +320,6 @@ module.exports = ARSystem = function(scene, cam, callback){
             const lng = data.lng;
             const pos = await crdConv.AsyncLatLng2Poition(lat, lng);
 
-            // self.Add2LatLng(cube, lat, lng);
-
             switch(data.valueType){
                 case "text":
                     // TODO: add2latlngに切り替え
@@ -258,6 +332,9 @@ module.exports = ARSystem = function(scene, cam, callback){
             console.log(JSON.stringify(data, null , "\t"));
         });
 
+        createText2DLocal("公共のマナー・周囲への注意を\n忘れないでください",
+            {x:0, y:0, z:-3, scale:0.25},
+            scene);
         callback();
     };
 

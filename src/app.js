@@ -68,9 +68,6 @@ const awake = () => {
 const start = () => {
     console.log('start');
 
-    arSystem.Add(cube);
-    cube.position.set(0, 0, -1);
-
     update();
 };
 
