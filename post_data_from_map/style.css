@@ -1,0 +1,154 @@
+html {
+    height: 100%;
+    width: 100%;
+}
+body { 
+    margin: 0; 
+  }
+.scene {
+    margin: 0;
+    padding: 0;
+    height: 50%;
+    border: 0px;
+    box-sizing: border-box;
+}
+.page {
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+    height: 100%;
+    width: 100%;
+}
+
+/* 下画面（マップ） */
+
+#mapfit {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+/* 上画面 */
+.button1{
+    /* width:200px; */
+    font-size: inherit;
+    display: inline-block;
+    /* font-weight:bold; */
+    text-decoration:none;
+    text-align:center;
+    padding:8px 10px; 
+    /* margin: 10px; */
+    color:#49a9d4;
+    background-color:#fff;
+    border: solid 2px #49a9d4;/*線*/
+    border-radius:4px;
+}
+.button2{
+    /* width:200px; */
+    font-size: inherit;
+    display: inline-block;
+    font-weight:bold;
+    text-decoration:none;
+    text-align:center;
+    padding:8px 10px; 
+    border-radius:4px;
+}
+.latlng {
+    color: #49a9d4;
+    margin: 10px;
+}
+
+
+#user_info{
+    text-align:right;
+    margin: 10px;
+    height: 7%;
+}
+#buttons{
+    text-align: center;
+}
+#dynamic_form_box1{
+    width: 100%;
+    height: 25%;
+    margin: 0px;
+    padding: 0px;
+    text-align: center;
+}
+#dynamic_form_box2{
+    text-align:left;
+    margin:0px auto;
+    width: 100%;
+    text-align: center;
+}
+#bottom{
+    position:absolute;
+    bottom: 50%;
+    width: 90%;
+}
+#delete_btn {
+    color:#fff;
+    background-color:#ff0000;
+}
+#registration_btn {
+    color:#fff;
+    background-color:#49a9d4;
+}
+#input_text {
+    height: 100%;
+    width: 90%;
+}
+#input_image {
+    margin: 2px;
+}
+#input_url {
+    width: 90%;
+}
+
+/* select */
+.select_form {
+    overflow: hidden;
+    width: 40%;
+    margin: 1px auto;
+    text-align: center;
+}
+.select_form select {
+    width: 100%;
+    padding-right: 1em;
+    cursor: pointer;
+    text-indent: 0.01px;
+    text-overflow: ellipsis;
+    border: none;
+    outline: none;
+    background: transparent;
+    background-image: none;
+    box-shadow: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.select_form select::-ms-expand {
+    display: none;
+}
+.select_form.sel {
+    position: relative;
+    border-radius: 2px;
+    border: 2px solid #49a9d4;
+    background: #ffffff;
+}
+.select_form.sel::before {
+    position: absolute;
+    top: 0.8em;
+    right: 0.8em;
+    width: 0;
+    height: 0;
+    padding: 0;
+    content: '';
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #49a9d4;
+    pointer-events: none;
+}
+.select_form.sel select {
+    padding: 8px 38px 8px 8px;
+    color: #49a9d4;
+}
