@@ -17,6 +17,6 @@ This application works using `Three.ar.js`. So, this application runs only on th
 
 - Register a spot
     ![register page](https://github.com/ttak0422/WebARMap/blob/upload_images/edit.png)
-    1. Access [**Application**](https://ttak0422.github.io/WebARMap/dist/) and press `マップ`. (※It is okay to accces this with devices not supported.)
-    2. Press `編集・投稿`.
+    1. Access [**Application**](https://ttak0422.github.io/WebARMap/dist/) and press `マップ`. (※It is okay to accces this with devices not supported.)
+    2. Press `編集・投稿`.
     3. Select a location and describe information about there.
