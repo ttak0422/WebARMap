@@ -324,7 +324,7 @@ module.exports = ARSystem = function(scene, cam, callback){
                 case "text":
                     // TODO: add2latlngに切り替え
                     createText2D(data.value,
-                        {x:pos.x, y:0, z:pos.z, scale:1},
+                        {x:pos.x, y:0, z:pos.z, scale:5},
                         scene);
                     console.log("call");
                     break;
