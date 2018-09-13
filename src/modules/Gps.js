@@ -36,7 +36,7 @@ module.exports = Gps = function(){
                     crd = pos.coords;
                     resolve(crd);
                 },
-                (err) => { reject(errorMessage[err.code]); },
+                (err) => reject(errorMessage[err.code]),
                 gpsOption
             );
         });
@@ -49,7 +49,7 @@ module.exports = Gps = function(){
 
     self.StartWatchiLatLng = () => {
         watchId = navigator.geolocation.watchPosition(
-            (pos) => { crd = pos.coords; },
+            (pos) => crd = pos.coords,
             (err) => { /* 無視 */ },
             gpsOption
         );
