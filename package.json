@@ -16,9 +16,6 @@
     "webpack-cli": "^3.0.8"
   },
   "dependencies": {
-    "co": "^4.6.0",
-    "firebase": "^5.4.2",
-    "gsap": "^2.0.1",
     "three": "^0.93.0",
     "three.ar.js": "^0.1.8"
   }
