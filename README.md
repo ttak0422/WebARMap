@@ -18,7 +18,11 @@ Please wait a little more because we can think of a method that can be used with
 
     2. [**Access Here!!**](https://ttak0422.github.io/WebARMap/dist/)
 
+
 - Register a spot
+    
+    WebARonARKit上でGoogleへのログインができない問題が確認されています。お手数ですがchromeなどから登録をお願いします。            
+    
     <img src="https://github.com/ttak0422/WebARMap/blob/upload_images/edit.png" width="500" />
     1. Access [**Application**](https://ttak0422.github.io/WebARMap/dist/) and press `マップ`. (※It is okay to accces this with devices not supported.)
     2. Press `編集・投稿`.
